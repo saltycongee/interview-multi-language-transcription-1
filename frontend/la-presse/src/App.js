@@ -12,7 +12,7 @@ import { updateLoginState } from "./Actions/loginActions";
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 import axios from 'axios';
-import { CallToActionSharp } from '@material-ui/icons';
+import ProgressBar from "@ramonak/react-progress-bar";
 
 
 function App(props) {
@@ -32,19 +32,16 @@ function App(props) {
 
   const api = 'https://c4r8tzi2r4.execute-api.us-east-1.amazonaws.com/dev';
 
-  const data = { "language": "en-US" };
+  const data = {
+    "sourceLanguageTranscribe": "en-US",
+    "sourceLanguageTranslate": "en",
+    "filename": "",
+    "targetLanguage": "fr"
+  };
 
-  async function onChange(e) {
-    const file = e.target.files[0];
-    try {
-      await Storage.put(file.name, file, {
-        progressCallback(progress) {
-          console.log(`Uploaded: ${progress.loaded}/${progress.total}`);
-        },
-      });
-    } catch (err) {
-      console.log('Error uploading file: ', err);
-    }
+  function onChange(e) {
+   const file = e.target.files[0];
+   onSubmit(file);
   }
 
   const options = [
@@ -94,7 +91,7 @@ function App(props) {
 
   function _sourceLanguageChosen(option) {
     console.log('Source Language ', option.label)
-    callApi()
+    setLanguageCodes(false, option.label)
   };
 
   function callApi() {
@@ -108,9 +105,64 @@ function App(props) {
       });
   }
 
+  function setLanguageCodes(target, language) {
+    if (target) {
+      switch (language) {
+        case "US English":
+          data['targetLanguage'] = "en"
+          break;
+        case "French":
+          data['targetLanguage'] = "fr"
+          break;
+        case "Spanish":
+          data['targetLanguage'] = "es"
+          break;
+        case "German":
+          data['targetLanguage'] = "de"
+          break;
+      }
+    } else {
+      switch (language) {
+        case "US English":
+          data['sourceLanguageTranscribe'] = "en-US"
+          data['sourceLanguageTranslate'] = "en"
+          break;
+        case "French":
+          data['sourceLanguageTranscribe'] = "fr-FR"
+          data['sourceLanguageTranslate'] = "fr"
+          break;
+        case "Spanish":
+          data['sourceLanguageTranscribe'] = "es-ES"
+          data['sourceLanguageTranslate'] = "es"
+          break;
+        case "German":
+          data['sourceLanguageTranscribe'] = "de-DE"
+          data['sourceLanguageTranslate'] = "de"
+          break;
+      }
+    }
+  }
+
   function _targetLanguageChosen(option) {
     console.log('Target Language ', option.label)
+    setLanguageCodes(true, option.label)
   };
+
+  async function onSubmit(file) {
+      try {
+        await Storage.put(file.name, file, {
+          progressCallback(progress) {
+            console.log(`Uploaded: ${progress.loaded}/${progress.total}`);
+            
+          },
+        });
+        data.filename = file.name
+        console.log("Calling api...")
+        callApi()
+      } catch (err) {
+        console.log('Error uploading file: ', err);
+      }
+  }
 
   return (
     <Grid style={{ width: "100vw", height: "100vh" }}>
@@ -146,7 +198,7 @@ function App(props) {
                 <p>
                   <button onClick={onSignOut} style={style}>
                     Sign Out
-                      </button>
+                  </button>
                 </p>
               </div>
             )

@@ -6,8 +6,9 @@
   width: 500px;
   padding: 20px;
   position: fixed; /* or absolute */
-  top: 35%;
+  top: 30%;
   left: 30%;
+  background-color: #f2faf8;
 }
 
 .App-logo {
