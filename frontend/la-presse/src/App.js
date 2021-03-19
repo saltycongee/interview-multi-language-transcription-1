@@ -12,7 +12,6 @@ import { updateLoginState } from "./Actions/loginActions";
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 import axios from 'axios';
-import ProgressBar from "@ramonak/react-progress-bar";
 
 
 function App(props) {
@@ -33,8 +32,7 @@ function App(props) {
   const api = 'https://c4r8tzi2r4.execute-api.us-east-1.amazonaws.com/dev';
 
   const data = {
-    "sourceLanguageTranscribe": "en-US",
-    "sourceLanguageTranslate": "en",
+    "sourceLanguage": "en",
     "filename": "",
     "targetLanguage": "fr"
   };
@@ -44,9 +42,10 @@ function App(props) {
    onSubmit(file);
   }
 
-  const options = [
-    'US English', 'Spanish', 'German', 'French'
-  ];
+  const options = [{value: 'en', label: 'US English'},
+  {value: 'fr', label: 'French'},
+  {value: 'es', label: 'Spanish'},
+  {value: 'de', label: 'German'}];
 
   const defaultOption = options[0];
 
@@ -90,8 +89,8 @@ function App(props) {
   }
 
   function _sourceLanguageChosen(option) {
-    console.log('Source Language ', option.label)
-    setLanguageCodes(false, option.label)
+    data['sourceLanguage'] = option.value
+    console.log('Source Language ', option.value)
   };
 
   function callApi() {
@@ -105,47 +104,9 @@ function App(props) {
       });
   }
 
-  function setLanguageCodes(target, language) {
-    if (target) {
-      switch (language) {
-        case "US English":
-          data['targetLanguage'] = "en"
-          break;
-        case "French":
-          data['targetLanguage'] = "fr"
-          break;
-        case "Spanish":
-          data['targetLanguage'] = "es"
-          break;
-        case "German":
-          data['targetLanguage'] = "de"
-          break;
-      }
-    } else {
-      switch (language) {
-        case "US English":
-          data['sourceLanguageTranscribe'] = "en-US"
-          data['sourceLanguageTranslate'] = "en"
-          break;
-        case "French":
-          data['sourceLanguageTranscribe'] = "fr-FR"
-          data['sourceLanguageTranslate'] = "fr"
-          break;
-        case "Spanish":
-          data['sourceLanguageTranscribe'] = "es-ES"
-          data['sourceLanguageTranslate'] = "es"
-          break;
-        case "German":
-          data['sourceLanguageTranscribe'] = "de-DE"
-          data['sourceLanguageTranslate'] = "de"
-          break;
-      }
-    }
-  }
-
   function _targetLanguageChosen(option) {
-    console.log('Target Language ', option.label)
-    setLanguageCodes(true, option.label)
+    data['targetLanguage'] = option.value
+    console.log('Target Language ', option.value)
   };
 
   async function onSubmit(file) {
