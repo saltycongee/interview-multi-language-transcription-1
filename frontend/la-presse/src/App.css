@@ -8,7 +8,8 @@
   position: fixed; /* or absolute */
   top: 30%;
   left: 30%;
-  background-color: #f2faf8;
+  background-image: url(Wave004.png);
+  background-size: cover;
 }
 
 .App-logo {

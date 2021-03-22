@@ -4,7 +4,6 @@ import Amplify, { Auth, Storage } from 'aws-amplify';
 import React, { Component } from 'react';
 import { Grid } from "semantic-ui-react";
 import Login from "./Components/Authentication/Login";
-import PageContainer from "./Views/PageContainer/PageContainer";
 import { Hub } from "aws-amplify";
 import { useState, useEffect } from "react";
 import { connect } from "react-redux";
@@ -31,21 +30,24 @@ function App(props) {
 
   const api = 'https://c4r8tzi2r4.execute-api.us-east-1.amazonaws.com/dev';
 
-  const data = {
+  let job_name = ""
+
+  const payload = {
     "sourceLanguage": "en",
     "filename": "",
-    "targetLanguage": "fr"
+    "targetLanguage": "fr",
+    "userid": ""
   };
 
   function onChange(e) {
-   const file = e.target.files[0];
-   onSubmit(file);
+    const file = e.target.files[0];
+    onSubmit(file);
   }
 
-  const options = [{value: 'en', label: 'US English'},
-  {value: 'fr', label: 'French'},
-  {value: 'es', label: 'Spanish'},
-  {value: 'de', label: 'German'}];
+  const options = [{ value: 'en', label: 'US English' },
+  { value: 'fr', label: 'French' },
+  { value: 'es', label: 'Spanish' },
+  { value: 'de', label: 'German' }];
 
   const defaultOption = options[0];
 
@@ -89,40 +91,47 @@ function App(props) {
   }
 
   function _sourceLanguageChosen(option) {
-    data['sourceLanguage'] = option.value
+    payload['sourceLanguage'] = option.value
     console.log('Source Language ', option.value)
   };
 
   function callApi() {
-    axios
-      .post(api, data)
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    let userid = ""
+    Auth.currentSession()
+      .then(data => {
+        payload['userid'] = data['accessToken']['payload']['username']
+        axios
+          .post(api, payload)
+          .then((response) => {
+            job_name = response['data']['body']
+            console.log(job_name)
+          })
+          .catch((error) => {
+            console.log(error);
+          })
+      }
+      )
   }
 
   function _targetLanguageChosen(option) {
-    data['targetLanguage'] = option.value
+    payload['targetLanguage'] = option.value
     console.log('Target Language ', option.value)
   };
 
   async function onSubmit(file) {
-      try {
-        await Storage.put(file.name, file, {
-          progressCallback(progress) {
-            console.log(`Uploaded: ${progress.loaded}/${progress.total}`);
-            
-          },
-        });
-        data.filename = file.name
-        console.log("Calling api...")
-        callApi()
-      } catch (err) {
-        console.log('Error uploading file: ', err);
-      }
+    try {
+      await Storage.put(file.name, file, {
+        progressCallback(progress) {
+          console.log(`Uploaded: ${progress.loaded}/${progress.total}`);
+
+        },
+      });
+      payload.filename = file.name
+      console.log("Calling api...")
+      callApi()
+    } catch (err) {
+      console.log('Error uploading file: ', err);
+    }
   }
 
   return (
