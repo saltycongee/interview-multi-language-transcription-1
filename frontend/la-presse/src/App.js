@@ -11,7 +11,7 @@ import { updateLoginState } from "./Actions/loginActions";
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 import axios from 'axios';
-
+import { Subject } from '@material-ui/icons';
 
 function App(props) {
 
@@ -39,6 +39,8 @@ function App(props) {
     "userid": ""
   };
 
+  let fileName = ""
+
   function onChange(e) {
     const file = e.target.files[0];
     onSubmit(file);
@@ -49,25 +51,14 @@ function App(props) {
   { value: 'es', label: 'Spanish' },
   { value: 'de', label: 'German' }];
 
-  const defaultOption = options[0];
-
   const { loginState, updateLoginState } = props;
 
   const [currentLoginState, updateCurrentLoginState] = useState(loginState);
-
-  const style = {
-    backgroundColor: 'white',
-    font: 'inherit',
-    border: '1px solid #ccc',
-    padding: '8px',
-    cursor: 'pointer'
-  };
 
   async function onSignOut() {
     updateLoginState("signIn");
     await Auth.signOut();
   }
-
 
   useEffect(() => {
     setAuthListener();
@@ -96,7 +87,6 @@ function App(props) {
   };
 
   function callApi() {
-    let userid = ""
     Auth.currentSession()
       .then(data => {
         payload['userid'] = data['accessToken']['payload']['username']
@@ -126,6 +116,7 @@ function App(props) {
 
         },
       });
+      fileName = file.name
       payload.filename = file.name
       console.log("Calling api...")
       callApi()
@@ -162,11 +153,11 @@ function App(props) {
                   <input
                     type="file"
                     onChange={onChange}
-                    style={style}
+                    className="InputFileButton"
                   />
                 </p>
                 <p>
-                  <button onClick={onSignOut} style={style}>
+                  <button onClick={onSignOut} className="InputFileButton">
                     Sign Out
                   </button>
                 </p>

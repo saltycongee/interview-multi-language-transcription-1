@@ -1,15 +1,25 @@
 .App {
   text-align: center;
-  margin: 10px;
-  border: 1px solid #eee;
-  box-shadow: 0 2px 2px #ccc;
-  width: 500px;
-  padding: 20px;
+  border: 1px solid black;
+  box-shadow: 15px 15px 75px 30px gray;
+  width: 600px;
+  padding: 60px;
   position: fixed; /* or absolute */
-  top: 30%;
-  left: 30%;
+  top: 25%;
+  left: 28%;
   background-image: url(Wave004.png);
   background-size: cover;
+  border-radius: 30px;
+}
+
+.InputFileButton {
+  background-color: black;
+  font: inherit;
+  border: 1px solid #ccc;
+  padding: 7px;
+  cursor: pointer;
+  color: white;
+  border-radius: 30px;
 }
 
 .App-logo {
