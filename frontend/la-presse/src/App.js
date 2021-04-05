@@ -64,6 +64,10 @@ function App(props) {
     showUploadForm: false
   })
 
+  const [rowState, updateRowState] = useState({
+    rows: []
+  })
+
   async function onSignOut() {
     updateLoginState("signIn");
     await Auth.signOut();
@@ -158,7 +162,6 @@ function App(props) {
   }
 
 
-  const rows = []
   let jobs;
 
   function showTable() {
@@ -179,7 +182,9 @@ function App(props) {
                 <Table.Cell> job.transcriptionUrl.S </Table.Cell>
                 <Table.Cell> job.status </Table.Cell>
               </Table.Row>
-              rows.push(r)
+              updateRowState({
+                rows: rowState.rows.push(r)
+              })
             }
           })
           .catch((error) => {
@@ -259,7 +264,7 @@ function App(props) {
 
                       <Table.Body>
                         {
-                          rows
+                          rowState.rows
                         }
                       </Table.Body>
                     </Table>
