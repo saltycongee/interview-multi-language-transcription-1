@@ -1,4 +1,4 @@
-.App {
+.UploadForm {
   text-align: center;
   border: 1px solid black;
   box-shadow: 15px 15px 75px 30px gray;
@@ -10,6 +10,12 @@
   background-image: url(Wave004.png);
   background-size: cover;
   border-radius: 30px;
+}
+
+.MenuBar {
+  position: fixed;
+  left: 1200px;
+  top: 7px;
 }
 
 .InputFileButton {

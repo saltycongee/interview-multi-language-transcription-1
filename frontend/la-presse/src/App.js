@@ -1,7 +1,6 @@
-import logo from './logo.svg';
 import './App.css';
 import Amplify, { Auth, Storage } from 'aws-amplify';
-import React, { Component } from 'react';
+import React from 'react';
 import { Grid } from "semantic-ui-react";
 import Login from "./Components/Authentication/Login";
 import { Hub } from "aws-amplify";
@@ -11,7 +10,9 @@ import { updateLoginState } from "./Actions/loginActions";
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 import axios from 'axios';
-import { Subject } from '@material-ui/icons';
+import { useAlert } from 'react-alert'
+import { Icon, Label, Menu, Table } from 'semantic-ui-react'
+import { getDefaultNormalizer } from '@testing-library/dom';
 
 function App(props) {
 
@@ -29,8 +30,7 @@ function App(props) {
   });
 
   const api = 'https://c4r8tzi2r4.execute-api.us-east-1.amazonaws.com/dev';
-
-  let job_name = ""
+  const scanApi = 'https://0opz07581b.execute-api.us-east-1.amazonaws.com/dev';
 
   const payload = {
     "sourceLanguage": "en",
@@ -39,11 +39,12 @@ function App(props) {
     "userid": ""
   };
 
-  let fileName = ""
+  const statusPayload = { "username": "" }
+
+  let file;
 
   function onChange(e) {
-    const file = e.target.files[0];
-    onSubmit(file);
+    file = e.target.files[0];
   }
 
   const options = [{ value: 'en', label: 'US English' },
@@ -54,6 +55,14 @@ function App(props) {
   const { loginState, updateLoginState } = props;
 
   const [currentLoginState, updateCurrentLoginState] = useState(loginState);
+
+  const [status, updateStatus] = useState({
+    showStatus: false
+  })
+
+  const [showUploadFormStatus, updateUploadFormStatus] = useState({
+    showUploadForm: false
+  })
 
   async function onSignOut() {
     updateLoginState("signIn");
@@ -86,6 +95,8 @@ function App(props) {
     console.log('Source Language ', option.value)
   };
 
+  let job_name;
+
   function callApi() {
     Auth.currentSession()
       .then(data => {
@@ -94,7 +105,9 @@ function App(props) {
           .post(api, payload)
           .then((response) => {
             job_name = response['data']['body']
-            console.log(job_name)
+            statusPayload['job_name'] = job_name.substring(1, job_name.length - 1);
+            console.log(statusPayload['job_name'])
+            toggleUploadStatus()
           })
           .catch((error) => {
             console.log(error);
@@ -108,7 +121,7 @@ function App(props) {
     console.log('Target Language ', option.value)
   };
 
-  async function onSubmit(file) {
+  async function onSubmit() {
     try {
       await Storage.put(file.name, file, {
         progressCallback(progress) {
@@ -116,13 +129,67 @@ function App(props) {
 
         },
       });
-      fileName = file.name
       payload.filename = file.name
       console.log("Calling api...")
       callApi()
     } catch (err) {
       console.log('Error uploading file: ', err);
     }
+  }
+
+  const alert = useAlert()
+
+  function showAlert() {
+    axios
+      .post(scanApi, statusPayload)
+      .then((response) => {
+        alert.show(response['data']['body'])
+        console.log(response)
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+  }
+
+  function toggleUploadStatus() {
+    updateUploadFormStatus({
+      showUploadForm: !showUploadFormStatus.showUploadForm
+    })
+  }
+
+
+  const rows = []
+  let jobs;
+
+  function showTable() {
+    Auth.currentSession()
+      .then(data => {
+        statusPayload['username'] = data['accessToken']['payload']['username']
+        console.log(statusPayload['username'])
+        axios
+          .post(scanApi, statusPayload)
+          .then((response) => {
+            jobs = JSON.parse(response['data']['body'])
+            jobs = jobs['Items']
+            console.log(jobs)
+            let job;
+            for (job in jobs) {
+              let r = <Table.Row>
+                <Table.Cell> job.job_name.S </Table.Cell>
+                <Table.Cell> job.transcriptionUrl.S </Table.Cell>
+                <Table.Cell> job.status </Table.Cell>
+              </Table.Row>
+              rows.push(r)
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          })
+      })
+  }
+
+  function refreshPage() {
+    window.location.reload(false);
   }
 
   return (
@@ -142,26 +209,63 @@ function App(props) {
           }
           {
             currentLoginState === "signedIn" && (
-              <div className="App">
-                <p>
-                  <Dropdown options={options} onChange={_sourceLanguageChosen} placeholder="Translate from" />
-                </p>
-                <p>
-                  <Dropdown options={options} onChange={_targetLanguageChosen} placeholder="Translate to" />
-                </p>
-                <p>
-                  <input
-                    type="file"
-                    onChange={onChange}
-                    className="InputFileButton"
-                  />
-                </p>
-                <p>
-                  <button onClick={onSignOut} className="InputFileButton">
-                    Sign Out
-                  </button>
-                </p>
-              </div>
+              showUploadFormStatus.showUploadForm ?
+                <div className="UploadForm">
+                  <p>
+                    <Dropdown options={options} onChange={_sourceLanguageChosen} placeholder="Translate from" />
+                  </p>
+                  <p>
+                    <Dropdown options={options} onChange={_targetLanguageChosen} placeholder="Translate to" />
+                  </p>
+                  <p>
+                    <input
+                      type="file"
+                      onChange={onChange}
+                      className="InputFileButton"
+                    />
+                  </p>
+                  {
+                    status.showStatus ?
+                      <p>
+                        <button onClick={showAlert} className="InputFileButton">
+                          Check Status
+                    </button>
+                      </p> : null
+                  }
+                  <p>
+                    <button onClick={onSubmit} className="InputFileButton">Submit</button>
+                    {" "}
+                    <button onClick={toggleUploadStatus} className="InputFileButton">Go back</button>
+                  </p>
+                </div> :
+                <div>
+                  {showTable()}
+                  <p className="MenuBar">
+                    <button className="InputFileButton" onClick={toggleUploadStatus}>Upload File</button>
+                    {" "}
+                    <button className="InputFileButton" onClick={refreshPage}>Refresh</button>
+                    {" "}
+                    <button onClick={onSignOut} className="InputFileButton">Sign Out</button>
+                  </p>
+                  <p>
+                    <Table celled>
+                      <Table.Header>
+                        <Table.Row>
+                          <Table.HeaderCell>Job ID</Table.HeaderCell>
+                          <Table.HeaderCell>Transcription URL</Table.HeaderCell>
+                          <Table.HeaderCell>Status</Table.HeaderCell>
+                        </Table.Row>
+                      </Table.Header>
+
+                      <Table.Body>
+                        {
+                          rows
+                        }
+                      </Table.Body>
+                    </Table>
+                  </p>
+                </div>
+
             )
           }
         </Grid.Column>
