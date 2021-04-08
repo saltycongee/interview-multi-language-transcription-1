@@ -13,9 +13,26 @@
 }
 
 .MenuBar {
-  position: fixed;
-  left: 1200px;
-  top: 7px;
+  padding: 10px;
+}
+
+.Table{
+  border: 1px solid white;
+}
+
+.TableView {
+  width: 600px;
+  padding: 60px;
+  position: relative;
+  top: 15%;
+  left: 28%;
+  border-radius: 20px;
+  box-shadow: 15px 15px 75px 30px gray;
+  border: 1px solid black;
+  background-image: url(Wave004.png);
+  background-size: cover;
+  overflow-y: scroll;
+  align-items: center;
 }
 
 .InputFileButton {

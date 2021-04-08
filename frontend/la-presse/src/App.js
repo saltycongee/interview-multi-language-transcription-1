@@ -64,8 +64,8 @@ function App(props) {
     showUploadForm: false
   })
 
-  const [rowState, updateRowState] = useState({
-    rows: []
+  const [jobState, updateJobState] = useState({
+    jobs: []
   })
 
   async function onSignOut() {
@@ -111,6 +111,16 @@ function App(props) {
             job_name = response['data']['body']
             statusPayload['job_name'] = job_name.substring(1, job_name.length - 1);
             console.log(statusPayload['job_name'])
+            let newJob = jobState.jobs.slice()
+            newJob.push(
+              {
+                'job_name': job_name.substring(1, job_name.length - 1),
+                'status': 'In progress',
+                'transcriptionUrl': ' '
+              })
+            updateJobState({
+              jobs: newJob
+            })
             toggleUploadStatus()
           })
           .catch((error) => {
@@ -162,9 +172,7 @@ function App(props) {
   }
 
 
-  let jobs;
-
-  function showTable() {
+  function fetchData() {
     Auth.currentSession()
       .then(data => {
         statusPayload['username'] = data['accessToken']['payload']['username']
@@ -172,20 +180,12 @@ function App(props) {
         axios
           .post(scanApi, statusPayload)
           .then((response) => {
-            jobs = JSON.parse(response['data']['body'])
-            jobs = jobs['Items']
-            console.log(jobs)
-            let job;
-            for (job in jobs) {
-              let r = <Table.Row>
-                <Table.Cell> job.job_name.S </Table.Cell>
-                <Table.Cell> job.transcriptionUrl.S </Table.Cell>
-                <Table.Cell> job.status </Table.Cell>
-              </Table.Row>
-              updateRowState({
-                rows: rowState.rows.push(r)
-              })
-            }
+            let newJob = JSON.parse(response['data']['body'])
+            newJob = newJob['Items']
+            console.log(newJob)
+            updateJobState({
+              jobs: newJob
+            })
           })
           .catch((error) => {
             console.log(error);
@@ -193,9 +193,42 @@ function App(props) {
       })
   }
 
+  async function downloadData(key) {
+    const signedURL = await Storage.get(key);
+    console.log(signedURL)
+    let a = document.createElement('a');
+    a.href = signedURL;
+    a.download = 'key';
+    a.click();
+  }
+
+  function showTable() {
+
+    const newRows = jobState.jobs.map((job) => {
+      const tokens = job.transcriptionUrl.split('/').slice(4);
+      const key = tokens.join('/');
+      return <Table.Row>
+        <Table.Cell> {job.job_name} </Table.Cell>
+        <Table.Cell> {job.transcriptionUrl!= ' ' ?
+          <button onClick={() => downloadData(key)}> Download
+          </button> : "In progress"
+        }
+        </Table.Cell>
+        <Table.Cell> {job.status} </Table.Cell>
+      </Table.Row>
+    }
+    )
+    return newRows;
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
   function refreshPage() {
     window.location.reload(false);
   }
+
 
   return (
     <Grid style={{ width: "100vw", height: "100vh" }}>
@@ -244,31 +277,48 @@ function App(props) {
                   </p>
                 </div> :
                 <div>
-                  {showTable()}
-                  <p className="MenuBar">
-                    <button className="InputFileButton" onClick={toggleUploadStatus}>Upload File</button>
-                    {" "}
-                    <button className="InputFileButton" onClick={refreshPage}>Refresh</button>
-                    {" "}
-                    <button onClick={onSignOut} className="InputFileButton">Sign Out</button>
-                  </p>
-                  <p>
-                    <Table celled>
+                  <div className="TableView">
+                    <Table celled class="ui inverted black table" className="Table">
                       <Table.Header>
                         <Table.Row>
                           <Table.HeaderCell>Job ID</Table.HeaderCell>
-                          <Table.HeaderCell>Transcription URL</Table.HeaderCell>
+                          <Table.HeaderCell>Transcription</Table.HeaderCell>
                           <Table.HeaderCell>Status</Table.HeaderCell>
                         </Table.Row>
                       </Table.Header>
 
                       <Table.Body>
                         {
-                          rowState.rows
+                          showTable()
                         }
                       </Table.Body>
+                      <Table.Footer>
+                        <Table.Row>
+                          <Table.HeaderCell colSpan='3'>
+                            <Menu floated='right' pagination>
+                              <Menu.Item as='a' icon>
+                                <Icon name='chevron left' />
+                              </Menu.Item>
+                              <Menu.Item as='a'>1</Menu.Item>
+                              <Menu.Item as='a'>2</Menu.Item>
+                              <Menu.Item as='a'>3</Menu.Item>
+                              <Menu.Item as='a'>4</Menu.Item>
+                              <Menu.Item as='a' icon>
+                                <Icon name='chevron right' />
+                              </Menu.Item>
+                            </Menu>
+                          </Table.HeaderCell>
+                        </Table.Row>
+                      </Table.Footer>
                     </Table>
-                  </p>
+                    <p className="MenuBar">
+                      <button className="InputFileButton" onClick={toggleUploadStatus}>Upload File</button>
+                      {" "}
+                      <button className="InputFileButton" onClick={refreshPage}>Refresh</button>
+                      {" "}
+                      <button onClick={onSignOut} className="InputFileButton">Sign Out</button>
+                    </p>
+                  </div>
                 </div>
 
             )
