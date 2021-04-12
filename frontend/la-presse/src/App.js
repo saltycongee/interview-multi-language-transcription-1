@@ -116,7 +116,10 @@ function App(props) {
               {
                 'job_name': job_name.substring(1, job_name.length - 1),
                 'status': 'In progress',
-                'transcriptionUrl': ' '
+                'transcriptionUrl': ' ',
+                'translateKey': ' ',
+                'sourceLanguage': payload['sourceLanguage'],
+                'targetLanguage': payload['targetLanguage']
               })
             updateJobState({
               jobs: newJob
@@ -205,16 +208,25 @@ function App(props) {
   function showTable() {
 
     const newRows = jobState.jobs.map((job) => {
-      const tokens = job.transcriptionUrl.split('/').slice(4);
-      const key = tokens.join('/');
+      let tokens = job.transcriptionUrl.split('/').slice(4);
+      const transcribeKey = tokens.join('/');
+      tokens = job.translateKey.split('/').slice(1);
+      const translateKey = tokens.join('/');
       return <Table.Row>
         <Table.Cell> {job.job_name} </Table.Cell>
+        <Table.Cell>{job.sourceLanguage}</Table.Cell>
+        <Table.Cell>{job.targetLanguage}</Table.Cell>
+        <Table.Cell> {job.status} </Table.Cell>
         <Table.Cell> {job.transcriptionUrl!= ' ' ?
-          <button onClick={() => downloadData(key)}> Download
+          <button onClick={() => downloadData(transcribeKey)}> Download
           </button> : "In progress"
         }
         </Table.Cell>
-        <Table.Cell> {job.status} </Table.Cell>
+        <Table.Cell> {job.translateKey!= ' ' ?
+          <button onClick={() => downloadData(translateKey)}> Download
+          </button> : "In progress"
+        }
+        </Table.Cell>
       </Table.Row>
     }
     )
@@ -282,8 +294,11 @@ function App(props) {
                       <Table.Header>
                         <Table.Row>
                           <Table.HeaderCell>Job ID</Table.HeaderCell>
-                          <Table.HeaderCell>Transcription</Table.HeaderCell>
+                          <Table.HeaderCell>Source Language</Table.HeaderCell>
+                          <Table.HeaderCell>Target Language</Table.HeaderCell>
                           <Table.HeaderCell>Status</Table.HeaderCell>
+                          <Table.HeaderCell>Transcription</Table.HeaderCell>
+                          <Table.HeaderCell>Translation</Table.HeaderCell>
                         </Table.Row>
                       </Table.Header>
 
@@ -294,7 +309,7 @@ function App(props) {
                       </Table.Body>
                       <Table.Footer>
                         <Table.Row>
-                          <Table.HeaderCell colSpan='3'>
+                          <Table.HeaderCell colSpan='1'>
                             <Menu floated='right' pagination>
                               <Menu.Item as='a' icon>
                                 <Icon name='chevron left' />

@@ -37,18 +37,6 @@ def lambda_handler(event, context):
     if event:
         file_type = filename.split(".")[1]
         
-        response = dynamoDB.put_item(
-            TableName = 'la-presse',
-            Item = {
-                'job_name' : {
-                    'S' : job_name
-                },
-                'username' : {
-                    'S' : userid
-                }
-            }
-            )
-        
         
         transcribe.start_transcription_job(TranscriptionJobName = job_name,
                                           Media = {"MediaFileUri" : fileLocation+filename},
@@ -73,7 +61,7 @@ def lambda_handler(event, context):
         
         key = "transcribeFiles/{}.json".format(job_name)
         localkey=os.path.basename(key)
-        txtfile='plainTextFiles/'+job_name+'/'+localkey+'.txt'
+        txtfile='public/plainTextFiles/'+job_name+'/'+localkey+'.txt'
         download_path = '/tmp/{}'.format(localkey)
         upload_path = '/tmp/{}.txt'.format(localkey)
         s3.download_file(BUCKET_NAME,key,download_path)
@@ -81,12 +69,28 @@ def lambda_handler(event, context):
         s3.upload_file(upload_path, '{}'.format(BUCKET_NAME), txtfile)
         
         
-        fileUrl = "s3://la-presse-main-bucket/plainTextFiles/"+job_name+"/"
-        translate_file(fileUrl,sourceLanguage,targetLanguage, job_name)
+        folderUrl = "s3://la-presse-main-bucket/public/plainTextFiles/"+job_name+"/"
+        translate_file(folderUrl,sourceLanguage,targetLanguage, job_name)
+        
+        fileUrl = folderUrl+job_name+".json.txt"
+        
+        response = dynamoDB.update_item(
+            TableName = 'la-presse',
+            Key = {
+                'job_name' : {'S' : job_name}
+                },
+            UpdateExpression="SET #P = :t, transcriptionUrl = :k",
+            ExpressionAttributeValues={
+                ':t': {'S':'Transcription complete, translation in porgress...'},
+                ':k': {'S':fileUrl}
+            },
+            ExpressionAttributeNames={
+                "#P":"status"
+            })
         
         return {
         'statusCode': 200,
-        'body': json.dumps(job_name)
+        'body': json.dumps(fileUrl)
     }
      
         
@@ -133,10 +137,11 @@ def translate_file(fileUrl, sourceLanguage, targetLanguage, job_name):
 
     translate.start_text_translation_job(JobName=job_name,
                                         InputDataConfig={'S3Uri': fileUrl, 'ContentType': 'text/plain'},
-                                        OutputDataConfig={'S3Uri': 's3://la-presse-main-bucket/translateFiles/'},
+                                        OutputDataConfig={'S3Uri': 's3://la-presse-main-bucket/public/translateFiles/'},
                                         DataAccessRoleArn='arn:aws:iam::313039493322:role/la-presse-translate-role',
                                         SourceLanguageCode=sourceLanguage,
                                         TargetLanguageCodes=[targetLanguage]
                                         )
+    
         
 

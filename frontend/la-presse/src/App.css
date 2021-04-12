@@ -21,11 +21,11 @@
 }
 
 .TableView {
-  width: 600px;
+  width: max-content;
   padding: 60px;
-  position: relative;
-  top: 15%;
-  left: 28%;
+  position: fixed;
+  top: 12%;
+  left: 13%;
   border-radius: 20px;
   box-shadow: 15px 15px 75px 30px gray;
   border: 1px solid black;
