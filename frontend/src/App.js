@@ -219,18 +219,18 @@ function App(props) {
       tokens = job.translateKey.split('/').slice(1);
       const translateKey = tokens.join('/');
       return <Table.Row>
-        <Table.Cell> {job.filename} </Table.Cell>
+        <Table.Cell> {job.fileName} </Table.Cell>
         <Table.Cell>{job.sourceLanguage}</Table.Cell>
         <Table.Cell>{job.targetLanguage}</Table.Cell>
         <Table.Cell> {job.status} </Table.Cell>
         <Table.Cell> {job.transcriptionUrl!= ' ' ?
-          <button onClick={() => downloadData(transcribeKey)}> Download
-          </button> : "In progress"
+          <Button onClick={() => downloadData(transcribeKey)}> Download
+          </Button> : "In progress"
         }
         </Table.Cell>
         <Table.Cell> {job.translateKey!= ' ' ?
-          <button onClick={() => downloadData(translateKey)}> Download
-          </button> : "In progress"
+          <Button onClick={() => downloadData(translateKey)}> Download
+          </Button> : "In progress"
         }
         </Table.Cell>
       </Table.Row>
@@ -268,10 +268,12 @@ function App(props) {
               showUploadFormStatus.showUploadForm ?
                 <div className="UploadForm">
                   <p>
-                    <Dropdown options={options} onChange={_sourceLanguageChosen} placeholder="Translate from" />
+                  <h4>Translate from</h4>
+                    <Dropdown options={options} onChange={_sourceLanguageChosen} placeholder="Chose from dropdown" />
                   </p>
                   <p>
-                    <Dropdown options={options} onChange={_targetLanguageChosen} placeholder="Translate to" />
+                  <h4>Translate to:</h4>
+                    <Dropdown options={options} onChange={_targetLanguageChosen} placeholder="Chose from dropdown" />
                   </p>
                   <p>
                     <input
@@ -283,9 +285,9 @@ function App(props) {
                   {
                     status.showStatus ?
                       <p>
-                        <button onClick={showAlert} className="InputFileButton">
+                        <Button onClick={showAlert} className="InputFileButton">
                           Check Status
-                    </button>
+                    </Button>
                       </p> : null
                   }
                   <p>
@@ -333,11 +335,11 @@ function App(props) {
                       </Table.Footer>
                     </Table>
                     <p className="MenuBar">
-                      <button className="InputFileButton" onClick={toggleUploadStatus}>Upload File</button>
+                      <Button className="InputFileButton" onClick={toggleUploadStatus}>Upload File</Button>
                       {" "}
-                      <button className="InputFileButton" onClick={refreshPage}>Refresh</button>
+                      <Button className="InputFileButton" onClick={refreshPage}>Refresh</Button>
                       {" "}
-                      <button onClick={onSignOut} className="InputFileButton">Sign Out</button>
+                      <Button onClick={onSignOut} className="InputFileButton">Sign Out</Button>
                     </p>
                   </div>
                 </div>
