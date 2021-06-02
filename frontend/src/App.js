@@ -34,9 +34,9 @@ function App(props) {
 
   const payload = {
     "sourceLanguage": "en",
-    "filename": "",
+    "fileName": "",
     "targetLanguage": "fr",
-    "userid": ""
+    "username": ""
   };
 
   const statusPayload = { "username": "" }
@@ -106,18 +106,20 @@ function App(props) {
     console.log (payload)
     Auth.currentSession()
       .then(data => {
-        payload['userid'] = data['accessToken']['payload']['username']
+        payload['username'] = data['accessToken']['payload']['username']
         axios
           .post(api, payload)
           .then((response) => {
             job_name = response['data']['body']
+            console.log('response')
+            console.log(response)
             statusPayload['job_name'] = job_name.substring(1, job_name.length - 1);
             console.log(statusPayload['job_name'])
             let newJob = jobState.jobs.slice()
             newJob.push(
               {
-                'username': payload['userid'],
-                'fileName': payload['filename'],
+                'username': payload['username'],
+                'fileName': payload['fileName'],
                 'job_name': job_name.substring(1, job_name.length - 1),
                 'status': 'In progress',
                 'transcriptionUrl': ' ',
@@ -150,7 +152,7 @@ function App(props) {
 
         },
       });
-      payload.filename = file.name
+      payload.fileName = file.name
       console.log("Calling api...")
       callApi()
     } catch (err) {
