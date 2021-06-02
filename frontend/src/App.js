@@ -1,7 +1,7 @@
 import './App.css';
 import Amplify, { Auth, Storage } from 'aws-amplify';
 import React from 'react';
-import { Grid } from "semantic-ui-react";
+import { Grid, Button } from "semantic-ui-react";
 import Login from "./Components/Authentication/Login";
 import { Hub } from "aws-amplify";
 import { useState, useEffect } from "react";
@@ -219,7 +219,7 @@ function App(props) {
       tokens = job.translateKey.split('/').slice(1);
       const translateKey = tokens.join('/');
       return <Table.Row>
-        <Table.Cell> {job.job_name} </Table.Cell>
+        <Table.Cell> {job.filename} </Table.Cell>
         <Table.Cell>{job.sourceLanguage}</Table.Cell>
         <Table.Cell>{job.targetLanguage}</Table.Cell>
         <Table.Cell> {job.status} </Table.Cell>
@@ -289,9 +289,9 @@ function App(props) {
                       </p> : null
                   }
                   <p>
-                    <button onClick={onSubmit} className="InputFileButton">Submit</button>
+                    <Button onClick={onSubmit} className="InputFileButton">Submit</Button>
                     {" "}
-                    <button onClick={toggleUploadStatus} className="InputFileButton">Go back</button>
+                    <Button onClick={toggleUploadStatus} className="InputFileButton">Go back</Button>
                   </p>
                 </div> :
                 <div>
@@ -299,7 +299,7 @@ function App(props) {
                     <Table celled class="ui inverted black table" className="Table">
                       <Table.Header>
                         <Table.Row>
-                          <Table.HeaderCell>Job ID</Table.HeaderCell>
+                          <Table.HeaderCell>File Name</Table.HeaderCell>
                           <Table.HeaderCell>Source Language</Table.HeaderCell>
                           <Table.HeaderCell>Target Language</Table.HeaderCell>
                           <Table.HeaderCell>Status</Table.HeaderCell>
