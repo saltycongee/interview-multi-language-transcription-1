@@ -102,6 +102,8 @@ function App(props) {
   let job_name;
 
   function callApi() {
+    console.log("payload")
+    console.log (payload)
     Auth.currentSession()
       .then(data => {
         payload['userid'] = data['accessToken']['payload']['username']
@@ -114,6 +116,8 @@ function App(props) {
             let newJob = jobState.jobs.slice()
             newJob.push(
               {
+                'username': payload['userid'],
+                'fileName': payload['filename'],
                 'job_name': job_name.substring(1, job_name.length - 1),
                 'status': 'In progress',
                 'transcriptionUrl': ' ',
