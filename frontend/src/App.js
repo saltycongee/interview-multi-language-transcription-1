@@ -167,6 +167,7 @@ function App(props) {
       .then((response) => {
         alert.show(response['data']['body'])
         console.log(response)
+        console.log(response)
       })
       .catch((error) => {
         console.log(error);
