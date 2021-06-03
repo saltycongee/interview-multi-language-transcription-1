@@ -1,7 +1,7 @@
 import './App.css';
 import Amplify, { Auth, Storage } from 'aws-amplify';
 import React from 'react';
-import { Grid, Button, Header, Dropdown, Icon, Menu, Table } from "semantic-ui-react";
+import { Grid, Button, Header, Icon, Menu, Table } from "semantic-ui-react";
 import Login from "./Components/Authentication/Login";
 import { Hub } from "aws-amplify";
 import { useState, useEffect } from "react";
@@ -10,6 +10,7 @@ import { updateLoginState } from "./Actions/loginActions";
 import 'react-dropdown/style.css';
 import axios from 'axios';
 import { useAlert } from 'react-alert'
+import Dropdown from 'react-dropdown';
 
 function App(props) {
 
@@ -267,13 +268,12 @@ function App(props) {
                 <div className="UploadForm">
                   <p>
                   <Header as='h4' inverted color = 'grey'>Translate from</Header>
-                    <Dropdown  inverted options={options} onChange={_sourceLanguageChosen} placeholder="Choose from dropdown" />
+                    <Dropdown options={options} onChange={_sourceLanguageChosen} placeholder="Choose from dropdown" />
                   </p>
                   <p>
                   <Header as='h4' inverted color = 'grey'>Translate to:</Header>
-                  <Menu inverted color='blue'>
-                  <Dropdown search inverted options={options} onChange={_targetLanguageChosen} placeholder="Choose from dropdown" />
-                  </Menu>
+                  
+                  <Dropdown options={options} onChange={_targetLanguageChosen} placeholder="Choose from dropdown" />
                     
                   </p>
                   <p>
