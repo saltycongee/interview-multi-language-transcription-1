@@ -267,11 +267,11 @@ function App(props) {
                 <div className="UploadForm">
                   <p>
                   <Header as='h4' inverted color = 'grey'>Translate from</Header>
-                    <Dropdown search fluid options={options} onChange={_sourceLanguageChosen} placeholder="Choose from dropdown" />
+                    <Dropdown search inverted options={options} onChange={_sourceLanguageChosen} placeholder="Choose from dropdown" />
                   </p>
                   <p>
                   <Header as='h4' inverted color = 'grey'>Translate to:</Header>
-                    <Dropdown search fluid options={options} onChange={_targetLanguageChosen} placeholder="Choose from dropdown" />
+                    <Dropdown search fluid inverted options={options} onChange={_targetLanguageChosen} placeholder="Choose from dropdown" />
                   </p>
                   <p>
                     <input
