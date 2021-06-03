@@ -219,6 +219,16 @@ function App(props) {
       const transcribeKey = tokens.join('/');
       tokens = job.translateKey.split('/').slice(1);
       const translateKey = tokens.join('/');
+
+      let translateStatus 
+      if (job.translateKey == ' ')
+          {translateStatus = "In progress"}
+      else if (job.translateKey == 'Invalid')
+          {translateStatus = "Invalid"}
+      else
+          {translateStatus ="<Button onClick={() => downloadData(translateKey)}> Download </Button>"}
+
+
       return <Table.Row>
         <Table.Cell> {job.fileName} </Table.Cell>
         <Table.Cell>{job.sourceLanguage}</Table.Cell>
@@ -229,10 +239,7 @@ function App(props) {
           </Button> : "In progress"
         }
         </Table.Cell>
-        <Table.Cell> {job.translateKey!= ' ' ?
-          <Button onClick={() => downloadData(translateKey)}> Download
-          </Button> : "In progress"
-        }
+        <Table.Cell> {translationStatus}
         </Table.Cell>
       </Table.Row>
     }
