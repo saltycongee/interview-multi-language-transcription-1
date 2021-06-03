@@ -211,7 +211,7 @@ function App(props) {
     a.click();
   }
 
-  let translationStatus = ' '
+  let translateStatus = ' '
   function showTable() {
 
     const newRows = jobState.jobs.map((job) => {
@@ -240,7 +240,7 @@ function App(props) {
           </Button> : "In progress"
         }
         </Table.Cell>
-        <Table.Cell> {translationStatus}
+        <Table.Cell> {translateStatus}
         </Table.Cell>
       </Table.Row>
     }
