@@ -1,24 +1,17 @@
 import './App.css';
 import Amplify, { Auth, Storage } from 'aws-amplify';
 import React from 'react';
-import { Grid, Button, Progress, Header, Dropdown } from "semantic-ui-react";
+import { Grid, Button, Header, Dropdown, Icon, Menu, Table } from "semantic-ui-react";
 import Login from "./Components/Authentication/Login";
 import { Hub } from "aws-amplify";
 import { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { updateLoginState } from "./Actions/loginActions";
-import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 import axios from 'axios';
 import { useAlert } from 'react-alert'
-import { Icon, Label, Menu, Table } from 'semantic-ui-react'
-import { getDefaultNormalizer } from '@testing-library/dom';
 
 function App(props) {
-
-  
-  
-  
 
   Amplify.configure({
     Auth: {
