@@ -16,6 +16,10 @@ import { getDefaultNormalizer } from '@testing-library/dom';
 
 function App(props) {
 
+  state = {
+    percentUploadToS3 : 0
+  }
+
   Amplify.configure({
     Auth: {
       identityPoolId: 'us-east-1:154afb63-c1a1-4b7d-b047-7273d030e4bf', //REQUIRED - Amazon Cognito Identity Pool ID
@@ -42,8 +46,6 @@ function App(props) {
   const statusPayload = { "username": "" }
 
   let file;
-
-  let progressPercent;
 
   function onChange(e) {
     file = e.target.files[0];
@@ -150,8 +152,11 @@ function App(props) {
     try {
       await Storage.put(file.name, file, {
         progressCallback(progress) {
-          progressPercent = (progress.loaded/progress.total)*100
-          console.log(`Uploaded: ${progress.loaded}/${progress.total}`);
+          this.setState((prevState) => ({
+            percentUploadToS3: prevState.percentUploadToS3 = (progress.loaded/progress.total)*100
+          }))
+          console.log(`Uploaded: (${progress.loaded}/${progress.total})`);
+          onsole.log(`Uploaded: $((progress.loaded/progress.total)*100)`);
 
         },
       });
