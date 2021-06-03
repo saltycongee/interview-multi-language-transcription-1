@@ -213,6 +213,8 @@ function App(props) {
   function showTable() {
 
     const newRows = jobState.jobs.map((job) => {
+      console.log("job")
+      console.log(job)
       let tokens = job.transcriptionUrl.split('/').slice(4);
       const transcribeKey = tokens.join('/');
       tokens = job.translateKey.split('/').slice(1);
