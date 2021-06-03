@@ -1,7 +1,7 @@
 import './App.css';
 import Amplify, { Auth, Storage } from 'aws-amplify';
 import React from 'react';
-import { Grid, Button } from "semantic-ui-react";
+import { Grid, Button, Progress } from "semantic-ui-react";
 import Login from "./Components/Authentication/Login";
 import { Hub } from "aws-amplify";
 import { useState, useEffect } from "react";
@@ -42,6 +42,8 @@ function App(props) {
   const statusPayload = { "username": "" }
 
   let file;
+
+  let progressPercent;
 
   function onChange(e) {
     file = e.target.files[0];
@@ -148,6 +150,7 @@ function App(props) {
     try {
       await Storage.put(file.name, file, {
         progressCallback(progress) {
+          progressPercent = (progress.loaded/progress.total)*100
           console.log(`Uploaded: ${progress.loaded}/${progress.total}`);
 
         },
@@ -268,11 +271,11 @@ function App(props) {
               showUploadFormStatus.showUploadForm ?
                 <div className="UploadForm">
                   <p>
-                  <h4>Translate from</h4>
+                  <h4 inverted>Translate from</h4>
                     <Dropdown options={options} onChange={_sourceLanguageChosen} placeholder="Chose from dropdown" />
                   </p>
                   <p>
-                  <h4>Translate to:</h4>
+                  <h4 inverted>Translate to:</h4>
                     <Dropdown options={options} onChange={_targetLanguageChosen} placeholder="Chose from dropdown" />
                   </p>
                   <p>
@@ -281,6 +284,9 @@ function App(props) {
                       onChange={onChange}
                       className="InputFileButton"
                     />
+                  </p>
+                  <p>
+                  <Progress percent = {progressPercent} indicating/>
                   </p>
                   {
                     status.showStatus ?
