@@ -210,6 +210,7 @@ function App(props) {
     a.click();
   }
 
+  let translationStatus = ' '
   function showTable() {
 
     const newRows = jobState.jobs.map((job) => {
@@ -220,7 +221,6 @@ function App(props) {
       tokens = job.translateKey.split('/').slice(1);
       const translateKey = tokens.join('/');
 
-      let translateStatus 
       if (job.translateKey == ' ')
           {translateStatus = "In progress"}
       else if (job.translateKey == 'Invalid')
