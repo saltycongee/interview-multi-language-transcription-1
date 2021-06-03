@@ -1,7 +1,7 @@
 import './App.css';
 import Amplify, { Auth, Storage } from 'aws-amplify';
 import React from 'react';
-import { Grid, Button, Progress } from "semantic-ui-react";
+import { Grid, Button, Progress, Header } from "semantic-ui-react";
 import Login from "./Components/Authentication/Login";
 import { Hub } from "aws-amplify";
 import { useState, useEffect } from "react";
@@ -16,9 +16,9 @@ import { getDefaultNormalizer } from '@testing-library/dom';
 
 function App(props) {
 
-  state = {
-    percentUploadToS3 : 0
-  }
+  
+  let percentUploadToS3 = 0
+  
 
   Amplify.configure({
     Auth: {
@@ -152,11 +152,9 @@ function App(props) {
     try {
       await Storage.put(file.name, file, {
         progressCallback(progress) {
-          this.setState((prevState) => ({
-            percentUploadToS3: prevState.percentUploadToS3 = (progress.loaded/progress.total)*100
-          }))
+          percentUploadToS3=  (progress.loaded/progress.total)*100
           console.log(`Uploaded: (${progress.loaded}/${progress.total})`);
-          onsole.log(`Uploaded: $((progress.loaded/progress.total)*100)`);
+          console.log(`Uploaded: $((progress.loaded/progress.total)*100)`);
 
         },
       });
@@ -276,12 +274,12 @@ function App(props) {
               showUploadFormStatus.showUploadForm ?
                 <div className="UploadForm">
                   <p>
-                  <h4 inverted>Translate from</h4>
-                    <Dropdown options={options} onChange={_sourceLanguageChosen} placeholder="Chose from dropdown" />
+                  <Header as='h4' inverted color = 'grey'>Translate from</Header>
+                    <Dropdown options={options} onChange={_sourceLanguageChosen} placeholder="Choose from dropdown" />
                   </p>
                   <p>
-                  <h4 inverted>Translate to:</h4>
-                    <Dropdown options={options} onChange={_targetLanguageChosen} placeholder="Chose from dropdown" />
+                  <Header as='h4' inverted color = 'grey'>Translate to:</Header>
+                    <Dropdown options={options} onChange={_targetLanguageChosen} placeholder="Choose from dropdown" />
                   </p>
                   <p>
                     <input
@@ -291,7 +289,7 @@ function App(props) {
                     />
                   </p>
                   <p>
-                  <Progress percent = {progressPercent} indicating/>
+                  <Progress percent = {percentUploadToS3} indicating/>
                   </p>
                   {
                     status.showStatus ?
