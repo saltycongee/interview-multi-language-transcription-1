@@ -288,7 +288,7 @@ function App(props) {
             <div>
             <Button onClick={() => downloadData(translateKey)}> <Icon name='download' /> </Button>
           
-            <Button onClick={() => portalStatus(job.filename)}>Edit</Button>
+            <Button onClick={() => portalStatus("ok")}>Edit</Button>
           </div>
 
         
@@ -421,12 +421,14 @@ function App(props) {
                     <div>
                     
                     <Portal open={showEditor}>
-                    Translation for {translationEditorStatus.showEditor}
+                    Translation for {translationEditorStatus.currentFilename}
                     <Segment color='grey'>
                     <Form>
                     <TextArea placeholder='Translation sample' />
                     </Form>
-                    
+                    <Button onClick={portalStatus}>
+                    Upload translation
+                    </Button>
                 
                     </Segment>
                     </Portal>
