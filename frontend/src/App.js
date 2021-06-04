@@ -421,14 +421,12 @@ function App(props) {
                     <div>
                     
                     <Portal open={showEditor}>
-                    Translation for {translationEditorStatus.currentFilename}
+                    Translation for {translationEditorStatus.showEditor}
                     <Segment color='grey'>
                     <Form>
                     <TextArea placeholder='Translation sample' />
                     </Form>
-                    <Button onClick={portalStatus}>
-                    Upload translation
-                    </Button>
+                    
                 
                     </Segment>
                     </Portal>
