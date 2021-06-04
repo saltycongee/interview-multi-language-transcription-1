@@ -246,6 +246,8 @@ function App(props) {
     console.log(a)
     a.href = signedURL;
     a.download = 'key';
+    console.log('a before click')
+    console.log(a)
     a.click();
   }
 
