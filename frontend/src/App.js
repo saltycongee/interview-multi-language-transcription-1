@@ -248,6 +248,12 @@ function App(props) {
     a.download = 'key';
     console.log('a before click')
     console.log(a)
+    fetch(signedURL)
+.then(response => response.json())
+.then(json => console.log(json)) 
+
+}
+
     a.click();
   }
 
