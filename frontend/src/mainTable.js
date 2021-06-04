@@ -15,9 +15,9 @@ class mainTable extends Component {
       api: "https://c4r8tzi2r4.execute-api.us-east-1.amazonaws.com/dev",
       scanApi: "https://0opz07581b.execute-api.us-east-1.amazonaws.com/dev",
       payload: {
-        sourceLanguage: "en",
+        sourceLanguage: "",
         fileName: "",
-        targetLanguage: "fr",
+        targetLanguage: "",
         username: "",
       },
       statusPayload: { username: "" },
@@ -27,6 +27,7 @@ class mainTable extends Component {
         { value: "es", label: "Spanish" },
         { value: "de", label: "German" },
       ],
+      showUploadForm : 'false'
     };
 
     this.onChange = this.onChange.bind(this);
@@ -43,10 +44,10 @@ class mainTable extends Component {
     this.callApi = this.callApi.bind(this);
   }
 
-  //let file;
+
 
   onChange(e) {
-    file = e.target.files[0];
+     let file = e.target.files[0];
   }
 
   sourceLanguageChosen(option) {
@@ -54,7 +55,6 @@ class mainTable extends Component {
     console.log("Source Language ", option.value);
   }
 
-  //let job_name;
 
   callApi() {
     console.log("payload");
@@ -64,7 +64,7 @@ class mainTable extends Component {
       axios
         .post(api, payload)
         .then((response) => {
-          job_name = response["data"]["body"];
+          let job_name = response["data"]["body"];
           console.log("response");
           console.log(response);
           statusPayload["job_name"] = job_name.substring(
@@ -114,12 +114,12 @@ class mainTable extends Component {
     }
   }
 
-  //const alert = useAlert()
 
   showAlert() {
     axios
       .post(scanApi, statusPayload)
       .then((response) => {
+        const alert = useAlert()
         alert.show(response["data"]["body"]);
         console.log(response);
       })
@@ -203,9 +203,9 @@ class mainTable extends Component {
     return newRows;
   }
 
-  //useEffect(() => {
-  //fetchData()
-  //}, [])
+    //useEffect(() => {
+    //fetchData()
+    //}, [])
 
   refreshPage() {
     window.location.reload(false);

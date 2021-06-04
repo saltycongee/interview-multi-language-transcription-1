@@ -1,7 +1,7 @@
 import './App.css';
 import Amplify, { Auth, Storage } from 'aws-amplify';
 import React from 'react';
-import { Grid, Button, Header, Icon, Menu, Table } from "semantic-ui-react";
+import { Grid, Button, Header, Icon, Menu, Table, TransitionablePortal, Form, TextArea } from "semantic-ui-react";
 import Login from "./Components/Authentication/Login";
 import { Hub } from "aws-amplify";
 import { useState, useEffect } from "react";
@@ -14,6 +14,7 @@ import Dropdown from 'react-dropdown';
 
 function App(props) {
 
+  // From AWS
   Amplify.configure({
     Auth: {
       identityPoolId: 'us-east-1:154afb63-c1a1-4b7d-b047-7273d030e4bf', //REQUIRED - Amazon Cognito Identity Pool ID
@@ -30,25 +31,28 @@ function App(props) {
   const api = 'https://c4r8tzi2r4.execute-api.us-east-1.amazonaws.com/dev';
   const scanApi = 'https://0opz07581b.execute-api.us-east-1.amazonaws.com/dev';
 
+
+  // Initialisations
+
   const payload = {
     "sourceLanguage": "en",
     "fileName": "",
     "targetLanguage": "fr",
     "username": ""
   };
-
   const statusPayload = { "username": "" }
+  const options = [
+    { value: 'en', label: 'US English' },
+    { value: 'fr', label: 'French' },
+    { value: 'es', label: 'Spanish' },
+    { value: 'de', label: 'German' }
+  ];
 
   let file;
+  let job_name;
+  let translateStatus = ' '
 
-  function onChange(e) {
-    file = e.target.files[0];
-  }
-
-  const options = [{ value: 'en', label: 'US English' },
-  { value: 'fr', label: 'French' },
-  { value: 'es', label: 'Spanish' },
-  { value: 'de', label: 'German' }];
+  //States
 
   const { loginState, updateLoginState } = props;
 
@@ -62,14 +66,15 @@ function App(props) {
     showUploadForm: false
   })
 
+  const [translationEditorStatus, updateTranslationEditorStatus] = useState({
+    showEditor: false,
+    primaryKey: '',
+    sortKey: ''
+  })
+
   const [jobState, updateJobState] = useState({
     jobs: []
   })
-
-  async function onSignOut() {
-    updateLoginState("signIn");
-    await Auth.signOut();
-  }
 
   useEffect(() => {
     setAuthListener();
@@ -78,6 +83,28 @@ function App(props) {
   useEffect(() => {
     updateCurrentLoginState(loginState);
   }, [loginState]);
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+
+
+
+  function onChange(e) {
+    file = e.target.files[0];
+  }
+
+
+
+  
+
+
+  async function onSignOut() {
+    updateLoginState("signIn");
+    await Auth.signOut();
+  }
+
 
 
   async function setAuthListener() {
@@ -97,7 +124,7 @@ function App(props) {
     console.log('Source Language ', option.value)
   };
 
-  let job_name;
+  
 
   function callApi() {
     console.log("payload")
@@ -211,7 +238,32 @@ function App(props) {
     a.click();
   }
 
-  let translateStatus = ' '
+
+  function editTranslation(){
+
+    return(
+      <TransitionablePortal
+        closeOnTriggerClick
+        onOpen={this.handleOpen}
+        onClose={this.handleClose}
+        openOnTriggerClick
+        trigger={
+          <Button
+            content={translationEditorStatus.showEditor ? 'Upload' : 'Edit'}
+            negative={open}
+            positive={!open}
+          />
+        }
+      >
+       <Form>
+        <TextArea placeholder='Tell us more' />
+          </Form>
+            
+      </TransitionablePortal>
+    )
+
+  }
+  
   function showTable() {
 
     const newRows = jobState.jobs.map((job) => {
@@ -222,12 +274,36 @@ function App(props) {
       tokens = job.translateKey.split('/').slice(1);
       const translateKey = tokens.join('/');
 
-      if (job.translateKey == ' ')
-          {translateStatus = "In progress"}
-      else if (job.translateKey == 'Invalid')
-          {translateStatus = "Invalid"}
+      if (job.translateKey === ' ') // In progress
+          {translateStatus = <Icon loading name='spinner' />}
+      else if (job.translateKey === 'Invalid') //Not applicable
+          {translateStatus = <Icon color='yellow' name='ban' />}
+      else if (job.translateKey === 'Not started') //Not started
+          {translateStatus = <Icon color='green' name='check circle' />}
       else
-          {translateStatus ="<Button onClick={() => downloadData(translateKey)}> Download </Button>"}
+          {translateStatus =
+            <div>
+            <Button onClick={() => downloadData(translateKey)}> <Icon name='download' /> </Button>
+            <TransitionablePortal
+        closeOnTriggerClick
+        onOpen={this.handleOpen}
+        onClose={this.handleClose}
+        openOnTriggerClick
+        trigger={
+          <Button
+            content={translationEditorStatus.showEditor ? 'Upload' : 'Edit'}
+            negative={translationEditorStatus.showEditor}
+            positive={!translationEditorStatus.showEditor}
+          />
+        }
+      >
+       <Form>
+        <TextArea placeholder='Tell us more' />
+          </Form>
+            
+      </TransitionablePortal>
+            </div>}
+            
 
 
       return <Table.Row>
@@ -235,9 +311,9 @@ function App(props) {
         <Table.Cell>{job.sourceLanguage}</Table.Cell>
         <Table.Cell>{job.targetLanguage}</Table.Cell>
         <Table.Cell> {job.status} </Table.Cell>
-        <Table.Cell> {job.transcriptionUrl!= ' ' ?
-          <Button onClick={() => downloadData(transcribeKey)}> Download
-          </Button> : "In progress"
+        <Table.Cell> {job.transcriptionUrl!== ' ' ?
+          <Button onClick={() => downloadData(transcribeKey)}> <Icon name='download' />
+          </Button> :  <Icon color='yellow' name='ban' />
         }
         </Table.Cell>
         <Table.Cell> {translateStatus}
@@ -248,9 +324,6 @@ function App(props) {
     return newRows;
   }
 
-  useEffect(() => {
-    fetchData()
-  }, [])
 
   function refreshPage() {
     window.location.reload(false);
