@@ -71,6 +71,9 @@ function App(props) {
     primaryKey: '',
     sortKey: ''
   })
+  const showEditor = translationEditorStatus.showEditor
+
+  
 
   const [jobState, updateJobState] = useState({
     jobs: []
@@ -240,6 +243,20 @@ function App(props) {
 
 
   //function editTranslation(){}
+
+
+  function handleOpen(){
+    updateTranslationEditorStatus(prevState =>{
+      return {...prevState, showEditor : true}
+    })
+  }
+
+  function handleClose(){
+    updateTranslationEditorStatus(prevState =>{
+      return {...prevState, showEditor : false}
+    })
+  }
+
   
   function showTable() {
 
@@ -263,8 +280,8 @@ function App(props) {
             <Button onClick={() => downloadData(translateKey)}> <Icon name='download' /> </Button>
             <TransitionablePortal
         closeOnTriggerClick
-        onOpen={this.handleOpen}
-        onClose={this.handleClose}
+        onOpen={handleOpen()}
+        onClose={handleClose()}
         openOnTriggerClick
         trigger={
           <Button
