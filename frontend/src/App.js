@@ -258,11 +258,11 @@ function App(props) {
   //function editTranslation(){}
 
 
-  function portalStatus(filename){
+  function portalStatus(){
     console.log("portalstatus changed")
     console.log (showEditor)
     updateTranslationEditorStatus(prevState =>{
-      return {...prevState, showEditor : !prevState.showEditor, currentFilename : filename}
+      return {...prevState, showEditor : !prevState.showEditor}
     })
   }
 
@@ -288,7 +288,7 @@ function App(props) {
             <div>
             <Button onClick={() => downloadData(translateKey)}> <Icon name='download' /> </Button>
           
-            <Button onClick={() => portalStatus("ok")}>Edit</Button>
+            <Button onClick={() => portalStatus()}>Edit</Button>
           </div>
 
         
@@ -421,7 +421,7 @@ function App(props) {
                     <div>
                     
                     <Portal open={showEditor}>
-                    Translation for {translationEditorStatus.currentFilename}
+                    Translation editor
                     <Segment color='grey'>
                     <Form>
                     <TextArea placeholder='Translation sample' />
