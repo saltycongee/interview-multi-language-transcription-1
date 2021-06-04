@@ -251,9 +251,6 @@ function App(props) {
     fetch(signedURL)
 .then(response => response.json())
 .then(json => console.log(json)) 
-
-}
-
     a.click();
   }
 
