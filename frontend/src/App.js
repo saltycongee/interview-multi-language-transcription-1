@@ -1,7 +1,7 @@
 import './App.css';
 import Amplify, { Auth, Storage } from 'aws-amplify';
 import React from 'react';
-import { Grid, Button, Header, Icon, Menu, Table, Portal, Form, TextArea } from "semantic-ui-react";
+import { Grid, Button, Header, Icon, Menu, Table, Portal, Form, TextArea, Segment } from "semantic-ui-react";
 import Login from "./Components/Authentication/Login";
 import { Hub } from "aws-amplify";
 import { useState, useEffect } from "react";
@@ -405,11 +405,23 @@ function App(props) {
                       {" "}
                       <Button onClick={onSignOut} className="InputFileButton">Sign Out</Button>
                     </p>
+                    <div>
+                    
                     <Portal open={showEditor}>
+                    <Segment
+                    style={{
+                      left: '40%',
+                      position: 'fixed',
+                      top: '50%',
+                      zIndex: 1000,
+                    }}
+                  >
                     <Form>
                     <TextArea placeholder='Tell us more' />
                     </Form>
+                    </Segment>
                     </Portal>
+                    </div>
                   </div>
                 </div>
 
