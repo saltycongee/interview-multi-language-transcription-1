@@ -242,15 +242,13 @@ function App(props) {
     console.log("signedURL")
     console.log(signedURL)
     let a = document.createElement('a');
-    console.log('a')
-    console.log(a)
     a.href = signedURL;
     a.download = 'key';
     console.log('a before click')
     console.log(a)
-    fetch(signedURL)
-.then(response => response.json())
-.then(json => console.log(json)) 
+    //fetch(signedURL)
+//.then(response => response.json())
+//.then(json => console.log(json)) 
     a.click();
   }
 
@@ -421,16 +419,9 @@ function App(props) {
                     <div>
                     
                     <Portal open={showEditor}>
-                    <Segment
-                    style={{
-                      left: '40%',
-                      position: 'fixed',
-                      top: '50%',
-                      zIndex: 1000,
-                    }}
-                  >
+                    <Segment inverted>
                     <Form>
-                    <TextArea placeholder='Tell us more' />
+                    <TextArea placeholder='Translationl us more' />
                     </Form>
                     </Segment>
                     </Portal>
