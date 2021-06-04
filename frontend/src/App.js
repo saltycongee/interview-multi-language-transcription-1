@@ -69,9 +69,14 @@ function App(props) {
   const [translationEditorStatus, updateTranslationEditorStatus] = useState({
     showEditor: false,
     primaryKey: '',
-    sortKey: ''
+    sortKey: '',
+    translateData:''
+
   })
   const showEditor = translationEditorStatus.showEditor
+  const primaryKey = translationEditorStatus.primaryKey
+  const sortKey = translationEditorStatus.sortKey
+  const translateData = translationEditorStatus.translateData
 
   
 
@@ -234,8 +239,11 @@ function App(props) {
 
   async function downloadData(key) {
     const signedURL = await Storage.get(key);
+    console.log("signedURL")
     console.log(signedURL)
     let a = document.createElement('a');
+    console.log('a')
+    console.log(a)
     a.href = signedURL;
     a.download = 'key';
     a.click();
