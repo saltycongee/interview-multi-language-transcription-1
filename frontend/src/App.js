@@ -246,6 +246,8 @@ function App(props) {
 
 
   function portalStatus(){
+    console.log("portalstatus changed")
+    console.log (showEditor)
     updateTranslationEditorStatus(prevState =>{
       return {...prevState, showEditor : !prevState.showEditor}
     })
@@ -272,12 +274,8 @@ function App(props) {
           {translateStatus =
             <div>
             <Button onClick={() => downloadData(translateKey)}> <Icon name='download' /> </Button>
-            <Portal open={showEditor}>
-            <Form>
-            <TextArea placeholder='Tell us more' />
-            </Form>
-            </Portal>
-          <Button onClick={() => portalStatus()}>{translationEditorStatus.showEditor ? 'Upload' : 'Edit'}</Button>
+          
+            <Button onClick={() => portalStatus()}>{translationEditorStatus.showEditor ? 'Upload' : 'Edit'}</Button>
           </div>
 
         
@@ -407,6 +405,11 @@ function App(props) {
                       {" "}
                       <Button onClick={onSignOut} className="InputFileButton">Sign Out</Button>
                     </p>
+                    <Portal open={showEditor}>
+                    <Form>
+                    <TextArea placeholder='Tell us more' />
+                    </Form>
+                    </Portal>
                   </div>
                 </div>
 
