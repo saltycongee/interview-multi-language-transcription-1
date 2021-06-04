@@ -437,8 +437,13 @@ function App(props) {
                   <div>
                     <Portal open={showEditor}>
                       <Segment>
+                      Editor
                         <Form>
                           <TextArea placeholder="Translation sample" />
+                       
+                        <Button onClick={portalStatus}>
+                          Upload translation
+                        </Button>
                         </Form>
                       </Segment>
                     </Portal>
