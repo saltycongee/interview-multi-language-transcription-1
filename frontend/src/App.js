@@ -70,13 +70,15 @@ function App(props) {
     showEditor: false,
     primaryKey: '',
     sortKey: '',
-    translateData:''
+    translateData:'',
+    currentFilename :''
 
   })
   const showEditor = translationEditorStatus.showEditor
   const primaryKey = translationEditorStatus.primaryKey
   const sortKey = translationEditorStatus.sortKey
   const translateData = translationEditorStatus.translateData
+  const currentFilename = translationEditorStatus.currentFilename
 
   
 
@@ -256,11 +258,11 @@ function App(props) {
   //function editTranslation(){}
 
 
-  function portalStatus(){
+  function portalStatus(filename){
     console.log("portalstatus changed")
     console.log (showEditor)
     updateTranslationEditorStatus(prevState =>{
-      return {...prevState, showEditor : !prevState.showEditor}
+      return {...prevState, showEditor : !prevState.showEditor, currentFilename : filename}
     })
   }
 
@@ -286,7 +288,7 @@ function App(props) {
             <div>
             <Button onClick={() => downloadData(translateKey)}> <Icon name='download' /> </Button>
           
-            <Button onClick={() => portalStatus()}>{translationEditorStatus.showEditor ? 'Upload' : 'Edit'}</Button>
+            <Button onClick={() => portalStatus(job.filename)}>Edit</Button>
           </div>
 
         
@@ -419,10 +421,16 @@ function App(props) {
                     <div>
                     
                     <Portal open={showEditor}>
+                    Translation for {translationEditorStatus.currentFilename}
                     <Segment inverted>
                     <Form>
-                    <TextArea placeholder='Translationl us more' />
+                    <TextArea placeholder='Translation sample' />
                     </Form>
+                    <Button
+                    content='Close Portal'
+                    negative
+                    onClick={portalStatus}
+                  />
                     </Segment>
                     </Portal>
                     </div>
