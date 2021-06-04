@@ -1,7 +1,7 @@
 import './App.css';
 import Amplify, { Auth, Storage } from 'aws-amplify';
 import React from 'react';
-import { Grid, Button, Header, Icon, Menu, Table, TransitionablePortal, Form, TextArea } from "semantic-ui-react";
+import { Grid, Button, Header, Icon, Menu, Table, Portal, Form, TextArea } from "semantic-ui-react";
 import Login from "./Components/Authentication/Login";
 import { Hub } from "aws-amplify";
 import { useState, useEffect } from "react";
@@ -245,15 +245,9 @@ function App(props) {
   //function editTranslation(){}
 
 
-  function handleOpen(){
+  function portalStatus(){
     updateTranslationEditorStatus(prevState =>{
-      return {...prevState, showEditor : true}
-    })
-  }
-
-  function handleClose(){
-    updateTranslationEditorStatus(prevState =>{
-      return {...prevState, showEditor : false}
+      return {...prevState, showEditor : !prevState.showEditor}
     })
   }
 
@@ -278,25 +272,19 @@ function App(props) {
           {translateStatus =
             <div>
             <Button onClick={() => downloadData(translateKey)}> <Icon name='download' /> </Button>
-            <TransitionablePortal
-        closeOnTriggerClick
-        onOpen={handleOpen()}
-        onClose={handleClose()}
-        openOnTriggerClick
-        trigger={
-          <Button
-            content={translationEditorStatus.showEditor ? 'Upload' : 'Edit'}
-            negative={translationEditorStatus.showEditor}
-            positive={!translationEditorStatus.showEditor}
-          />
+            <Portal open={showEditor}>
+            <Form>
+            <TextArea placeholder='Tell us more' />
+            </Form>
+            </Portal>
+          <Button onClick={() => portalStatus()}>{translationEditorStatus.showEditor ? 'Upload' : 'Edit'}</Button>
+          </div>
+
+        
         }
-      >
-       <Form>
-        <TextArea placeholder='Tell us more' />
-          </Form>
-            
-      </TransitionablePortal>
-            </div>}
+
+
+    
             
 
 
