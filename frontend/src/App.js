@@ -239,30 +239,7 @@ function App(props) {
   }
 
 
-  function editTranslation(){
-
-    return(
-      <TransitionablePortal
-        closeOnTriggerClick
-        onOpen={this.handleOpen}
-        onClose={this.handleClose}
-        openOnTriggerClick
-        trigger={
-          <Button
-            content={translationEditorStatus.showEditor ? 'Upload' : 'Edit'}
-            negative={open}
-            positive={!open}
-          />
-        }
-      >
-       <Form>
-        <TextArea placeholder='Tell us more' />
-          </Form>
-            
-      </TransitionablePortal>
-    )
-
-  }
+  //function editTranslation(){}
   
   function showTable() {
 
