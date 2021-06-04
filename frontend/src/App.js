@@ -263,7 +263,7 @@ function App(props) {
       tokens = job.translateKey.split("/").slice(1);
       const translateKey = tokens.join("/");
 
-      if (job.translateKey === " ") {
+      if (job.translateKey === "In progress") {
         // In progress
         translateStatus = <Icon loading name="spinner" />;
       } else if (job.translateKey === "Invalid") {
@@ -299,7 +299,7 @@ function App(props) {
                 <Icon name="download" />
               </Button>
             ) : (
-              <Icon color="yellow" name="ban" />
+              <Icon loading name="spinner" />
             )}
           </Table.Cell>
           <Table.Cell> {translateStatus}</Table.Cell>
