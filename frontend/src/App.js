@@ -271,7 +271,7 @@ function App(props) {
         translateStatus = <Icon color="yellow" name="ban" />;
       } else if (job.translateKey === "Not started") {
         //Not started
-        translateStatus = <Icon color="green" name="check circle" />;
+        translateStatus = <Icon name="pause circle" />;
       } else {
         translateStatus = (
           <div>
