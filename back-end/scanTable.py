@@ -3,7 +3,7 @@ import boto3
 
 def lambda_handler(event, context):
     dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table('la-presse')
+    table = dynamodb.Table('la-presse-updated-main-table')
     username = event['username']
     print(username)
     print(event['username'])

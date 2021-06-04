@@ -13,7 +13,7 @@ def lambda_handler(event, context):
     dynamoDB = boto3.client("dynamodb")
     
     
-    userid = event['userid']
+    username = event['username']
     
     sourceLanguage = event['sourceLanguage']
     if sourceLanguage == "en":
@@ -29,17 +29,17 @@ def lambda_handler(event, context):
     targetLanguage = event['targetLanguage']
     print(sourceLanguageTranscribe)
     print(targetLanguage)
-    filename = event['filename']
+    fileName = event['fileName']
     fileLocation = "s3://la-presse-main-bucket/public/"
     BUCKET_NAME = "la-presse-main-bucket"
     job_name = event['job_name']
     
     if event:
-        file_type = filename.split(".")[1]
+        file_type = fileName.split(".")[1]
         
         
         transcribe.start_transcription_job(TranscriptionJobName = job_name,
-                                          Media = {"MediaFileUri" : fileLocation+filename},
+                                          Media = {"MediaFileUri" : fileLocation+fileName},
                                           MediaFormat = file_type,
                                           LanguageCode = sourceLanguageTranscribe,
                                           Settings = {'ShowSpeakerLabels': True,
@@ -70,19 +70,30 @@ def lambda_handler(event, context):
         
         
         folderUrl = "s3://la-presse-main-bucket/public/plainTextFiles/"+job_name+"/"
-        translate_file(folderUrl,sourceLanguage,targetLanguage, job_name)
+        
+        if (sourceLanguage != targetLanguage):
+            translate_file(folderUrl,sourceLanguage,targetLanguage, job_name)
+            currentStatus = 'Transcription complete, translation in progress...'
+            translateKey = 'In progress'
+            
+        else:
+            currentStatus = 'Transcription complete.'
+            translateKey = 'Invalid'
+        
         
         fileUrl = folderUrl+job_name+".json.txt"
         
         response = dynamoDB.update_item(
-            TableName = 'la-presse',
+            TableName = 'la-presse-updated-main-table',
             Key = {
-                'job_name' : {'S' : job_name}
+                'username' : {'S' : username},
+                'fileName' : {'S' : fileName}
                 },
-            UpdateExpression="SET #P = :t, transcriptionUrl = :k",
+            UpdateExpression="SET #P = :t, transcriptionUrl = :k, translateKey = :l",
             ExpressionAttributeValues={
-                ':t': {'S':'Transcription complete, translation in porgress...'},
-                ':k': {'S':fileUrl}
+                ':t': {'S':currentStatus},
+                ':k': {'S':fileUrl},
+                ':l': {'S': translateKey}
             },
             ExpressionAttributeNames={
                 "#P":"status"

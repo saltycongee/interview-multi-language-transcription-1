@@ -18,18 +18,26 @@ def updateDatabase(jobid):
     
     response = translate.describe_text_translation_job(JobId=jobid)
     
-    job_name = response['TextTranslationJobProperties']['JobName']
+    
+    metaData = response['TextTranslationJobProperties']['JobName'].split("._.")
+    
+    print("response")
+    print (response)
+    username = metaData[0]+"@"+metaData[1]
+    fileName = metaData[2]
+    job_name = metaData[3]
     
     outputfileurl = response['TextTranslationJobProperties']['OutputDataConfig']['S3Uri']
     targetLanguageCode = response['TextTranslationJobProperties']['TargetLanguageCodes']
-    key = split(outputfileurl, '/', 3)[1] + targetLanguageCode[0] + '.' + job_name + '.json.txt'
+    key = split(outputfileurl, '/', 3)[1] + targetLanguageCode[0] + '.' + response['TextTranslationJobProperties']['JobName'] + '.json.txt'
     
     logger.debug('S3 key is: {}' .format(key))
     
     ddbresponse = dynamoDB.update_item(
-            TableName = 'la-presse',
+            TableName = 'la-presse-updated-main-table',
             Key = {
-                'job_name' : {'S' : job_name}
+                'username' : {'S' : username},
+                'fileName' : {'S' : fileName},
                 },
             UpdateExpression="SET #P = :t, translateKey = :k",
             ExpressionAttributeValues={

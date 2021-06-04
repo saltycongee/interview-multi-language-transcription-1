@@ -6,12 +6,14 @@ def lambda_handler(event, context):
     client = boto3.client('lambda')
     dynamoDB = boto3.client('dynamodb')
     
+    username = event['username'].split("@")
+    
     payload = {
-        'userid': event['userid'],
+        'username': event['username'],
         'sourceLanguage': event['sourceLanguage'],
         'targetLanguage': event['targetLanguage'],
-        'filename': event['filename'],
-        'job_name': context.aws_request_id
+        'fileName': event['fileName'],
+        'job_name': username[0]+"._."+username[1]+"._."+event['fileName'] +"._."+context.aws_request_id+event['targetLanguage']
     }
     
     response = client.invoke(
@@ -21,13 +23,16 @@ def lambda_handler(event, context):
         )
     
     response = dynamoDB.put_item(
-            TableName = 'la-presse',
+            TableName = 'la-presse-updated-main-table',
             Item = {
+                'fileName' : {
+                    'S' : payload['fileName']
+                },
                 'job_name' : {
                     'S' : payload['job_name']
                 },
                 'username' : {
-                    'S' : payload['userid']
+                    'S' : payload['username']
                 },
                 'sourceLanguage' : {
                     'S' : payload['sourceLanguage']
@@ -39,13 +44,15 @@ def lambda_handler(event, context):
                     'S' : ' '
                 },
                 'translateKey' : {
-                    'S' : ' '
+                    'S' : 'Not started'
                 },
                 'status' : {
                     'S' : "In Progress"
                 }
             }
             )
+    print ("respones")
+    print (response)
     
     return {
         'statusCode': 200,
