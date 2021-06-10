@@ -83,11 +83,13 @@ function App(props) {
     currentFilename: "",
   });
 
+  const [translationData, updateTranslationData] = useState('')
+
 
   const showEditor = translationEditorStatus.showEditor;
   //const primaryKey = translationEditorStatus.primaryKey;
   //const sortKey = translationEditorStatus.sortKey;
-  const translateData = setTranslationData.translateData;
+   //const translateData = translationEditorStatus.translateData;
   //const currentFilename = translationEditorStatus.currentFilename;
 
   const [jobState, updateJobState] = useState({
@@ -256,8 +258,8 @@ function App(props) {
   }
 
   const handleTranslationChange = (event) => {
-    setTranslationdata(event.target.translateData);
-    console.log(translateData)
+    updateTranslationdata(event.target.value);
+    console.log(translationData)
   
   };
   function showTable() {
