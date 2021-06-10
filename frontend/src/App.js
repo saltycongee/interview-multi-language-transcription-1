@@ -61,6 +61,8 @@ function App(props) {
   let job_name;
   let translateStatus = " ";
 
+  let allowedExts = ['flac','mp3','mp4','ogg', 'webm', 'amr', 'wav']
+
   //States
 
   const { loginState, updateLoginState } = props;
@@ -85,6 +87,7 @@ function App(props) {
 
   const [translationData, updateTranslationData] = useState(' ')
   const [translationKey, updateTranslationKey] = useState('')
+  const [fileStatus, updateFileStatus] = useState(true)
 
 
   const showEditor = translationEditorStatus.showEditor;
@@ -109,8 +112,16 @@ function App(props) {
     fetchData();
   }, []);
 
-  function onChange(e) {
-    file = e.target.files[0];
+  function onFileChange(e) {
+    file = e.target.files[0];0
+    let fileName = file.name
+    let fileExt = str.substring(fileName.lastIndexOf(".")+1, fileName.length);
+    if (allowedExts.indexOf(fileExt) !== -1){
+      updateFileStatus(true)
+    }
+    else{
+      updateFileStatus(false)
+    }
   }
 
   async function onSignOut() {
@@ -132,25 +143,25 @@ function App(props) {
 
   function _sourceLanguageChosen(option) {
     payload["sourceLanguage"] = option.value;
-    console.log("Source Language ", option.value);
+    //console.log("Source Language ", option.value);
   }
 
   function callApi() {
-    console.log("payload");
-    console.log(payload);
+    //console.log("payload");
+    //console.log(payload);
     Auth.currentSession().then((data) => {
       payload["username"] = data["accessToken"]["payload"]["username"];
       axios
         .post(api, payload)
         .then((response) => {
           job_name = response["data"]["body"];
-          console.log("response");
-          console.log(response);
+          //.log("response");
+          //console.log(response);
           statusPayload["job_name"] = job_name.substring(
             1,
             job_name.length - 1
           );
-          console.log(statusPayload["job_name"]);
+          //console.log(statusPayload["job_name"]);
           let newJob = jobState.jobs.slice();
           newJob.push({
             username: payload["username"],
@@ -168,28 +179,28 @@ function App(props) {
           toggleUploadStatus();
         })
         .catch((error) => {
-          console.log(error);
+          //console.log(error);
         });
     });
   }
 
   function _targetLanguageChosen(option) {
     payload["targetLanguage"] = option.value;
-    console.log("Target Language ", option.value);
+    //console.log("Target Language ", option.value);
   }
 
   async function onSubmit() {
     try {
       await Storage.put(file.name, file, {
         progressCallback(progress) {
-          console.log(`Uploaded: (${progress.loaded}/${progress.total})`);
+          //console.log(`Uploaded: (${progress.loaded}/${progress.total})`);
         },
       });
       payload.fileName = file.name;
-      console.log("Calling api...");
+      //console.log("Calling api...");
       callApi();
     } catch (err) {
-      console.log("Error uploading file: ", err);
+      //console.log("Error uploading file: ", err);
     }
   }
 
@@ -200,11 +211,11 @@ function App(props) {
       .post(scanApi, statusPayload)
       .then((response) => {
         alert.show(response["data"]["body"]);
-        console.log(response);
-        console.log(response);
+        //console.log(response);
+        //console.log(response);
       })
       .catch((error) => {
-        console.log(error);
+        //console.log(error);
       });
   }
 
@@ -217,13 +228,13 @@ function App(props) {
   function fetchData() {
     Auth.currentSession().then((data) => {
       statusPayload["username"] = data["accessToken"]["payload"]["username"];
-      console.log(statusPayload["username"]);
+      //console.log(statusPayload["username"]);
       axios
         .post(scanApi, statusPayload)
         .then((response) => {
           let newJob = JSON.parse(response["data"]["body"]);
           newJob = newJob["Items"];
-          console.log(newJob);
+          //console.log(newJob);
           updateJobState({
             jobs: newJob,
           });
@@ -239,24 +250,24 @@ function App(props) {
     let a = document.createElement("a");
     a.href = signedURL;
     a.download = "key";
-    console.log(a);
+    //console.log(a);
     a.click();
   }
 
   async function editTranslation(key){
     portalStatus(true)
     updateTranslationKey(key)
-    console.log(key)
+    //console.log(key)
     const signedURL = await Storage.get(key,{ download: true });
     signedURL.Body.text().then(string => { 
       updateTranslationData(string)
     });
-    console.log(translationData)
+    //console.log(translationData)
   }
 
   async function handleTranslationUpload(){
     const key = translationKey
-    console.log(key)
+    //console.log(key)
 
     const result = await Storage.put(key, translationData,
       {
@@ -264,15 +275,16 @@ function App(props) {
             console.log(`Uploaded: ${progress.loaded}/${progress.total}`);
       },
     });
-    console.log("result")
-    console.log(result)
-    console.log(translationData)
+    editTranslation(key)
+    //console.log("result")
+    //console.log(result)
+    //console.log(translationData)
 
   }
 
   function portalStatus(portalState) {
-    console.log("portalstatus changed");
-    console.log(showEditor);
+    //console.log("portalstatus changed");
+    //console.log(showEditor);
     updateTranslationEditorStatus((prevState) => {
       return { ...prevState, showEditor: portalState };
     });
@@ -280,13 +292,13 @@ function App(props) {
 
   const handleTranslationChange = (event) => {
     updateTranslationData(event.target.value);
-    console.log(translationData)
+    console.log("called")
   
   };
   function showTable() {
     const newRows = jobState.jobs.map((job) => {
-      console.log("job");
-      console.log(job);
+      //console.log("job");
+      //console.log(job);
       let tokens = job.transcriptionUrl.split("/").slice(4);
       const transcribeKey = tokens.join("/");
       tokens = job.translateKey.split("/").slice(1);
@@ -387,7 +399,7 @@ function App(props) {
                 <p>
                   <input
                     type="file"
-                    onChange={onChange}
+                    onChange={onFileChange}
                     className="InputFileButton"
                   />
                 </p>
@@ -398,8 +410,13 @@ function App(props) {
                     </Button>
                   </p>
                 ) : null}
+                {fileStatus ? (
+                  <p>
+                  Invalid file type!
+                  </p>
+                ) : null}
                 <p>
-                  <Button onClick={onSubmit} className="InputFileButton">
+                  <Button disabled={fileStatus} onClick={onSubmit} className="InputFileButton">
                     Submit
                   </Button>{" "}
                   <Button
