@@ -246,6 +246,7 @@ function App(props) {
   async function editTranslation(key){
     portalStatus(true)
     updateTranslationKey(key)
+    console.log(key)
     const signedURL = await Storage.get(key,{ download: true });
     signedURL.Body.text().then(string => { 
       updateTranslationData(string)
