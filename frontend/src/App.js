@@ -84,6 +84,7 @@ function App(props) {
   });
 
   const [translationData, updateTranslationData] = useState('')
+  const [translationKey, updateTranslationKey] = useState('')
 
 
   const showEditor = translationEditorStatus.showEditor;
@@ -243,7 +244,8 @@ function App(props) {
   }
 
   async function editTranslation(key){
-    portalStatus()
+    portalStatus(true)
+    updateTranslationKey(key)
     const signedURL = await Storage.get(key,{ download: true });
     signedURL.Body.text().then(string => { 
       updateTranslationData(string)
@@ -251,11 +253,22 @@ function App(props) {
     });
   }
 
-  function portalStatus() {
+  async function handleTranslationUpload(){
+    key = translationKey
+    console.log(key)
+    await s3.putObject({
+      Bucket: 'la-presse-main-bucket',
+      Key: key,
+      Body: translateData
+    }).promise();
+
+  }
+
+  function portalStatus(portalState) {
     console.log("portalstatus changed");
     console.log(showEditor);
     updateTranslationEditorStatus((prevState) => {
-      return { ...prevState, showEditor: !prevState.showEditor };
+      return { ...prevState, showEditor: portalState };
     });
   }
 
@@ -451,7 +464,7 @@ function App(props) {
                         <Form>
                           <TextArea value={translationData} onChange={handleTranslationChange} />
                        
-                        <Button onClick={portalStatus}>
+                        <Button onClick={handleTranslationUpload}>
                           Upload translation
                         </Button>
                         </Form>
