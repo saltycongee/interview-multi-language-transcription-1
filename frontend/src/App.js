@@ -259,7 +259,7 @@ function App(props) {
     await Storage.putObject({
       Bucket: 'la-presse-main-bucket',
       Key: key,
-      Body: translateData
+      Body: translationData
     }).promise();
 
   }
