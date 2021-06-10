@@ -233,14 +233,14 @@ function App(props) {
     const signedURL = await Storage.get(key);
     console.log("signedURL");
     console.log(signedURL);
+
+    console.log("Raw text:\n" + signedURL.Body.toString('ascii'))
+
     let a = document.createElement("a");
     a.href = signedURL;
     a.download = "key";
     console.log("a before click");
     console.log(a);
-    //fetch(signedURL)
-    //.then(response => response.json())
-    //.then(json => console.log(json))
     a.click();
   }
 
