@@ -115,7 +115,7 @@ function App(props) {
   function onFileChange(e) {
     file = e.target.files[0];0
     let fileName = file.name
-    let fileExt = str.substring(fileName.lastIndexOf(".")+1, fileName.length);
+    let fileExt = fileName.substring(fileName.lastIndexOf(".")+1, fileName.length);
     if (allowedExts.indexOf(fileExt) !== -1){
       updateFileStatus(true)
     }
