@@ -258,7 +258,7 @@ function App(props) {
   }
 
   const handleTranslationChange = (event) => {
-    updateTranslationdata(event.target.value);
+    updateTranslationData(event.target.value);
     console.log(translationData)
   
   };
@@ -447,7 +447,7 @@ function App(props) {
                       <Segment>
                       Editor
                         <Form>
-                          <TextArea value={translateData} onChange={handleTranslationChange} />
+                          <TextArea value={translationData} onChange={handleTranslationChange} />
                        
                         <Button onClick={portalStatus}>
                           Upload translation
