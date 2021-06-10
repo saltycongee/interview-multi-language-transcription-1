@@ -22,7 +22,6 @@ import "react-dropdown/style.css";
 import axios from "axios";
 import { useAlert } from "react-alert";
 import Dropdown from "react-dropdown";
-import TextField from '@material-ui/core/TextField'
 
 function App(props) {
   // From AWS
@@ -231,20 +230,25 @@ function App(props) {
   }
 
   async function downloadData(key) {
-    const signedURL = await Storage.get(key);
-    let a = document.createElement("a");
-    a.href = signedURL;
-    a.download = "key";
-    console.log(a);
-    a.click();
-  }
-
-  async function editTranslation(key){
     const signedURL = await Storage.get(key,{ download: true });
+    console.log("signedURL");
+    console.log(signedURL);
+
     signedURL.Body.text().then(string => { 
       console.log(string)
     });
+
+    
+
+    //let a = document.createElement("a");
+    //a.href = signedURL;
+    //a.download = "key";
+    //console.log("a before click");
+    //console.log(a);
+    //a.click();
   }
+
+  //function editTranslation(){}
 
   function portalStatus() {
     console.log("portalstatus changed");
