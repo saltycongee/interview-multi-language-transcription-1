@@ -250,8 +250,8 @@ function App(props) {
     const signedURL = await Storage.get(key,{ download: true });
     signedURL.Body.text().then(string => { 
       updateTranslationData(string)
-      console.log(string)
     });
+    console.log(translationData)
   }
 
   async function handleTranslationUpload(){
@@ -261,6 +261,7 @@ function App(props) {
     const result = await Storage.put(key, translationData);
     console.log("result")
     console.log(result)
+    console.log(translationData)
 
   }
 
