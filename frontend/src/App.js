@@ -230,7 +230,7 @@ function App(props) {
   }
 
   async function downloadData(key) {
-    const signedURL = await Storage.get(key);
+    const signedURL = await Storage.get(key,{ download: true });
     console.log("signedURL");
     console.log(signedURL);
 
@@ -240,12 +240,12 @@ function App(props) {
 
     
 
-    let a = document.createElement("a");
-    a.href = signedURL;
-    a.download = "key";
-    console.log("a before click");
-    console.log(a);
-    a.click();
+    //let a = document.createElement("a");
+    //a.href = signedURL;
+    //a.download = "key";
+    //console.log("a before click");
+    //console.log(a);
+    //a.click();
   }
 
   //function editTranslation(){}
