@@ -256,11 +256,10 @@ function App(props) {
   async function handleTranslationUpload(){
     const key = translationKey
     console.log(key)
-    await Storage.putObject({
-      Bucket: 'la-presse-main-bucket',
-      Key: key,
-      Body: translationData
-    }).promise();
+
+    const result = await Storage.put(key, translationData);
+    console.log("result")
+    console.log(result)
 
   }
 
