@@ -209,6 +209,7 @@ function App(props) {
     });
   }
 
+
   function fetchData() {
     Auth.currentSession().then((data) => {
       statusPayload["username"] = data["accessToken"]["payload"]["username"];
@@ -229,8 +230,11 @@ function App(props) {
     });
   }
 
+
+
   async function downloadData(key) {
-    const signedURL = await Storage.getObject(key);
+    //const data = await s3.getObject({ Bucket, Key }).promise()
+    const signedURL = await Storage.getObject(key).promise();
     console.log("signedURL");
     console.log(signedURL);
 
@@ -243,6 +247,9 @@ function App(props) {
     console.log(a);
     a.click();
   }
+
+
+  
 
   //function editTranslation(){}
 
