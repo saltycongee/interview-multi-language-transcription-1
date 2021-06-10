@@ -83,7 +83,7 @@ function App(props) {
     currentFilename: "",
   });
 
-  const [translationData, updateTranslationData] = useState('')
+  const [translationData, updateTranslationData] = useState(' ')
   const [translationKey, updateTranslationKey] = useState('')
 
 
@@ -254,7 +254,7 @@ function App(props) {
   }
 
   async function handleTranslationUpload(){
-    key = translationKey
+    const key = translationKey
     console.log(key)
     await Storage.putObject({
       Bucket: 'la-presse-main-bucket',
