@@ -410,7 +410,7 @@ function App(props) {
                     </Button>
                   </p>
                 ) : null}
-                {fileStatus ? (
+                {!fileStatus ? (
                   <p>
                   <Header as="h4" inverted color="grey">
                   Invalid file type!
