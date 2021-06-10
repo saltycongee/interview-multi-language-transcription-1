@@ -82,11 +82,13 @@ function App(props) {
     translateData: "",
     currentFilename: "",
   });
+
+
   const showEditor = translationEditorStatus.showEditor;
-  const primaryKey = translationEditorStatus.primaryKey;
-  const sortKey = translationEditorStatus.sortKey;
-  const translateData = translationEditorStatus.translateData;
-  const currentFilename = translationEditorStatus.currentFilename;
+  //const primaryKey = translationEditorStatus.primaryKey;
+  //const sortKey = translationEditorStatus.sortKey;
+  const translateData = setTranslationData.translateData;
+  //const currentFilename = translationEditorStatus.currentFilename;
 
   const [jobState, updateJobState] = useState({
     jobs: [],
@@ -230,25 +232,20 @@ function App(props) {
   }
 
   async function downloadData(key) {
-    const signedURL = await Storage.get(key,{ download: true });
-    console.log("signedURL");
-    console.log(signedURL);
+    const signedURL = await Storage.get(key);
+    let a = document.createElement("a");
+    a.href = signedURL;
+    a.download = "key";
+    console.log(a);
+    a.click();
+  }
 
+  async function editTranslation(key){
+    const signedURL = await Storage.get(key,{ download: true });
     signedURL.Body.text().then(string => { 
       console.log(string)
     });
-
-    
-
-    //let a = document.createElement("a");
-    //a.href = signedURL;
-    //a.download = "key";
-    //console.log("a before click");
-    //console.log(a);
-    //a.click();
   }
-
-  //function editTranslation(){}
 
   function portalStatus() {
     console.log("portalstatus changed");
@@ -258,6 +255,11 @@ function App(props) {
     });
   }
 
+  const handleTranslationChange = (event) => {
+    setTranslationdata(event.target.translateData);
+    console.log(translateData)
+  
+  };
   function showTable() {
     const newRows = jobState.jobs.map((job) => {
       console.log("job");
@@ -443,7 +445,7 @@ function App(props) {
                       <Segment>
                       Editor
                         <Form>
-                          <TextArea placeholder="Translation sample" />
+                          <TextArea value={translateData} onChange={handleTranslationChange} />
                        
                         <Button onClick={portalStatus}>
                           Upload translation
