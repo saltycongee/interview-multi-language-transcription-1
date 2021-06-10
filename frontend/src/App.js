@@ -209,7 +209,6 @@ function App(props) {
     });
   }
 
-
   function fetchData() {
     Auth.currentSession().then((data) => {
       statusPayload["username"] = data["accessToken"]["payload"]["username"];
@@ -230,15 +229,16 @@ function App(props) {
     });
   }
 
-
-
   async function downloadData(key) {
-    //const data = await s3.getObject({ Bucket, Key }).promise()
-    const signedURL = await Storage.getObject(key).promise();
+    const signedURL = await Storage.get(key,{ download: true });
     console.log("signedURL");
     console.log(signedURL);
 
-    console.log("Raw text:\n" + signedURL.Body.toString('ascii'))
+    signedURL.Body.text().then(string => { 
+      console.log(string)
+    });
+
+    
 
     let a = document.createElement("a");
     a.href = signedURL;
@@ -247,9 +247,6 @@ function App(props) {
     console.log(a);
     a.click();
   }
-
-
-  
 
   //function editTranslation(){}
 
