@@ -258,7 +258,12 @@ function App(props) {
     const key = translationKey
     console.log(key)
 
-    const result = await Storage.put(key, translationData);
+    const result = await Storage.put(key, translationData,
+      {
+        progressCallback(progress) {
+            console.log(`Uploaded: ${progress.loaded}/${progress.total}`);
+      },
+    });
     console.log("result")
     console.log(result)
     console.log(translationData)
