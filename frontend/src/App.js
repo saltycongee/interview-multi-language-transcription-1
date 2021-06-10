@@ -412,11 +412,13 @@ function App(props) {
                 ) : null}
                 {fileStatus ? (
                   <p>
+                  <Header as="h4" inverted color="grey">
                   Invalid file type!
+                </Header>
                   </p>
                 ) : null}
                 <p>
-                  <Button disabled={fileStatus} onClick={onSubmit} className="InputFileButton">
+                  <Button disabled={!fileStatus} onClick={onSubmit} className="InputFileButton">
                     Submit
                   </Button>{" "}
                   <Button
