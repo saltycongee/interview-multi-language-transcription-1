@@ -256,7 +256,7 @@ function App(props) {
   async function handleTranslationUpload(){
     key = translationKey
     console.log(key)
-    await s3.putObject({
+    await Storage.putObject({
       Bucket: 'la-presse-main-bucket',
       Key: key,
       Body: translateData
