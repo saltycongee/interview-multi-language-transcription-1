@@ -230,7 +230,7 @@ function App(props) {
   }
 
   async function downloadData(key) {
-    const signedURL = await Storage.get(key);
+    const signedURL = await Storage.getObject(key);
     console.log("signedURL");
     console.log(signedURL);
 
