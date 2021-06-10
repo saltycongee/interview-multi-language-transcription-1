@@ -274,8 +274,9 @@ function App(props) {
         progressCallback(progress) {
             console.log(`Uploaded: ${progress.loaded}/${progress.total}`);
       },
-    });
+    }); 
     editTranslation(key)
+    portalStatus(false)
     //console.log("result")
     //console.log(result)
     //console.log(translationData)
