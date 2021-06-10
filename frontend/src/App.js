@@ -243,8 +243,10 @@ function App(props) {
   }
 
   async function editTranslation(key){
+    portalStatus()
     const signedURL = await Storage.get(key,{ download: true });
     signedURL.Body.text().then(string => { 
+      updateTranslationData(string)
       console.log(string)
     });
   }
@@ -288,7 +290,7 @@ function App(props) {
               <Icon name="download" />{" "}
             </Button>
 
-            <Button onClick={() => portalStatus()}>Edit</Button>
+            <Button onClick={() => editTranslation(translateKey)}>Edit</Button>
           </div>
         );
       }
