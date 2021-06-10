@@ -22,6 +22,7 @@ import "react-dropdown/style.css";
 import axios from "axios";
 import { useAlert } from "react-alert";
 import Dropdown from "react-dropdown";
+import TextField from '@material-ui/core/TextField'
 
 function App(props) {
   // From AWS
@@ -82,13 +83,11 @@ function App(props) {
     translateData: "",
     currentFilename: "",
   });
-
-
   const showEditor = translationEditorStatus.showEditor;
-  //const primaryKey = translationEditorStatus.primaryKey;
-  //const sortKey = translationEditorStatus.sortKey;
-  const translateData = setTranslationData.translateData;
-  //const currentFilename = translationEditorStatus.currentFilename;
+  const primaryKey = translationEditorStatus.primaryKey;
+  const sortKey = translationEditorStatus.sortKey;
+  const translateData = translationEditorStatus.translateData;
+  const currentFilename = translationEditorStatus.currentFilename;
 
   const [jobState, updateJobState] = useState({
     jobs: [],
@@ -255,11 +254,6 @@ function App(props) {
     });
   }
 
-  const handleTranslationChange = (event) => {
-    setTranslationdata(event.target.translateData);
-    console.log(translateData)
-  
-  };
   function showTable() {
     const newRows = jobState.jobs.map((job) => {
       console.log("job");
@@ -445,7 +439,7 @@ function App(props) {
                       <Segment>
                       Editor
                         <Form>
-                          <TextArea value={translateData} onChange={handleTranslationChange} />
+                          <TextArea placeholder="Translation sample" />
                        
                         <Button onClick={portalStatus}>
                           Upload translation
