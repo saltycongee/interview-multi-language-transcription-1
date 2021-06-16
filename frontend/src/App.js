@@ -8,6 +8,7 @@ import {
   Icon,
   Menu,
   Table,
+  Modal,
   Portal,
   Form,
   TextArea,
@@ -484,7 +485,7 @@ function App(props) {
                     </Button>
                   </p>
                   <div>
-                    <Portal open={showEditor}>
+                    <Modal open={showEditor}>
                       <Segment>
                       Editor
                         <Form>
@@ -495,7 +496,7 @@ function App(props) {
                         </Button>
                         </Form>
                       </Segment>
-                    </Portal>
+                    </Modal>
                   </div>
                 </div>
               </div>
