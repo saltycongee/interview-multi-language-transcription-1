@@ -513,6 +513,9 @@ function App(props) {
                     </Button>{" "}
                     <Button onClick={onSignOut} className="InputFileButton">
                       Sign Out
+                    </Button>{" "}
+                    <Button onClick={() => updateKeyphraseSearchStatus(!showKeyphraseSearchStatus)} className="InputFileButton">
+                      Search
                     </Button>
                   </p>
                   <div>
