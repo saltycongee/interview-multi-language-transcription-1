@@ -51,6 +51,13 @@ function App(props) {
     targetLanguage: "",
     username: "",
   };
+
+
+  const searchPayload={
+    username:'',
+    targetLanguage:''
+  }
+
   const statusPayload = { username: "" };
   const options = [
     { value: "en", label: "US English" },
@@ -194,6 +201,11 @@ function App(props) {
     //console.log("Target Language ", option.value);
   }
 
+  function _searchTargetLanguageChosen(option) {
+    searchPayload["targetLanguage"] = option.value;
+    //console.log("Target Language ", option.value);
+  }
+
   async function onSubmit() {
     try {
       await Storage.put(file.name, file, {
@@ -215,19 +227,22 @@ function App(props) {
   function searchKeyphrases() {
     console.log('keyphrase')
     console.log(keyphrase)
-    const searchPayload = {'username':payload['username'], 'translateTarget': payload['targetLanguage'], 'keyphrase':keyphrase}
-    axios
-      .post(searchApi, searchPayload)
-      .then((response) => {
-        console.log(response);
-        console.log(response);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    updateKeyphraseSearchStatus(!showKeyphraseSearchStatus)
-
-  }
+    Auth.currentSession().then((data) => {
+      searchPayload["username"] = data["accessToken"]["payload"]["username"];
+      const finalSearchPayload = {'username':searchPayload['username'], 'translateTarget': searchPayload['targetLanguage'], 'keyphrase':keyphrase}
+      axios
+        .post(searchApi, finalSearchPayload)
+        .then((response) => {
+          console.log(response);
+          console.log(response);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+  updateKeyphraseSearchStatus(!showKeyphraseSearchStatus)
+      
+  })
+}
 
   
 
@@ -542,6 +557,11 @@ function App(props) {
                       <Button onClick={searchKeyphrases}>
                         Search
                       </Button>
+                      <Dropdown
+                      options={options}
+                      onChange={_searchTargetLanguageChosen}
+                      placeholder="Choose from dropdown"
+                    />
                       </Form>
                     </Segment>
                   </Modal>
