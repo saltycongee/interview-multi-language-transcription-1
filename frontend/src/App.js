@@ -41,6 +41,7 @@ function App(props) {
 
   const api = "https://c4r8tzi2r4.execute-api.us-east-1.amazonaws.com/dev";
   const scanApi = "https://0opz07581b.execute-api.us-east-1.amazonaws.com/dev";
+  const searchApi = "https://3wzc0n9cbb.execute-api.us-east-1.amazonaws.com/Stage_1";
 
   // Initialisations
 
@@ -77,6 +78,9 @@ function App(props) {
   const [showUploadFormStatus, updateUploadFormStatus] = useState({
     showUploadForm: false,
   });
+
+  const [showKeyphraseSearchStatus, updateKeyphraseSearchStatus] = useState(false);
+  const [keyphrase, updateKeyphrase] = useState(' ')
 
   const [translationEditorStatus, updateTranslationEditorStatus] = useState({
     showEditor: false,
@@ -207,6 +211,26 @@ function App(props) {
 
   const alert = useAlert();
 
+
+  function searchKeyphrases() {
+    console.log('keyphrase')
+    console.log(keyphrase)
+    searchPayload = {'Keyphrase':keyphrase}
+    axios
+      .post(searchApi, searchPayload)
+      .then((response) => {
+        console.log(response);
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    updateKeyphraseSearchStatus(!showKeyphraseSearchStatus)
+
+  }
+
+  
+
   function showAlert() {
     axios
       .post(scanApi, statusPayload)
@@ -295,8 +319,15 @@ function App(props) {
   const handleTranslationChange = (event) => {
     updateTranslationData(event.target.value);
     console.log("called")
-  
   };
+
+  const handleKeyphraseChange = (event) => {
+    updateKeyphrase(event.target.value);
+    console.log("called")
+  };
+
+
+
   function showTable() {
     const newRows = jobState.jobs.map((job) => {
       //console.log("job");
@@ -498,6 +529,20 @@ function App(props) {
                       </Segment>
                     </Modal>
                   </div>
+                  <div>
+                  <Modal open={showKeyphraseSearchStatus}>
+                    <Segment>
+                    Editor
+                      <Form>
+                      <TextArea placeholder='Enter keyphrase' onChange={handleKeyphraseChange} />
+                     
+                      <Button onClick={searchKeyphrases}>
+                        Search
+                      </Button>
+                      </Form>
+                    </Segment>
+                  </Modal>
+                </div>
                 </div>
               </div>
             ))}
