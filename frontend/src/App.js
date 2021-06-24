@@ -215,7 +215,7 @@ function App(props) {
   function searchKeyphrases() {
     console.log('keyphrase')
     console.log(keyphrase)
-    searchPayload = {'Keyphrase':keyphrase}
+    const searchPayload = {'Keyphrase':keyphrase}
     axios
       .post(searchApi, searchPayload)
       .then((response) => {
