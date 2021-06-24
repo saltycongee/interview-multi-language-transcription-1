@@ -46,9 +46,9 @@ function App(props) {
   // Initialisations
 
   const payload = {
-    sourceLanguage: "en",
+    sourceLanguage: "",
     fileName: "",
-    targetLanguage: "fr",
+    targetLanguage: "",
     username: "",
   };
   const statusPayload = { username: "" };
@@ -215,7 +215,7 @@ function App(props) {
   function searchKeyphrases() {
     console.log('keyphrase')
     console.log(keyphrase)
-    const searchPayload = {'Keyphrase':keyphrase}
+    const searchPayload = {'username':payload['username'], 'translateTarget': payload['targetLanguage'], 'keyphrase':keyphrase}
     axios
       .post(searchApi, searchPayload)
       .then((response) => {
