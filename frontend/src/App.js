@@ -9,7 +9,6 @@ import {
   Menu,
   Table,
   Modal,
-  Portal,
   Form,
   TextArea,
   Segment,

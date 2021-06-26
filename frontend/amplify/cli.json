@@ -14,11 +14,7 @@
       "enablecaseinsensitivity": true
     },
     "codegen": {
-      "useappsyncmodelgenplugin": true,
-      "usedocsgeneratorplugin": true,
-      "usetypesgeneratorplugin": true,
-      "cleangeneratedmodelsdirectory": true,
-      "retaincasestyle": true
+      "useappsyncmodelgenplugin": true
     },
     "appsync": {
       "generategraphqlpermissions": true
