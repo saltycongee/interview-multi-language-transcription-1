@@ -40,7 +40,8 @@ function App(props) {
 
   const api = "https://c4r8tzi2r4.execute-api.us-east-1.amazonaws.com/dev";
   const scanApi = "https://0opz07581b.execute-api.us-east-1.amazonaws.com/dev";
-  const searchApi = "https://3wzc0n9cbb.execute-api.us-east-1.amazonaws.com/Stage_1";
+  const searchApi =
+    "https://3wzc0n9cbb.execute-api.us-east-1.amazonaws.com/Stage_1";
 
   // Initialisations
 
@@ -51,11 +52,10 @@ function App(props) {
     username: "",
   };
 
-
-  const searchPayload={
-    username:'',
-    targetLanguage:''
-  }
+  const searchPayload = {
+    username: "",
+    targetLanguage: "",
+  };
 
   const statusPayload = { username: "" };
   const options = [
@@ -69,7 +69,7 @@ function App(props) {
   let job_name;
   let translateStatus = " ";
 
-  let allowedExts = ['flac','mp3','mp4','ogg', 'webm', 'amr', 'wav']
+  let allowedExts = ["flac", "mp3", "mp4", "ogg", "webm", "amr", "wav"];
 
   //States
 
@@ -85,8 +85,9 @@ function App(props) {
     showUploadForm: false,
   });
 
-  const [showKeyphraseSearchStatus, updateKeyphraseSearchStatus] = useState(false);
-  const [keyphrase, updateKeyphrase] = useState(' ')
+  const [showKeyphraseSearchStatus, updateKeyphraseSearchStatus] =
+    useState(false);
+  const [keyphrase, updateKeyphrase] = useState(" ");
 
   const [translationEditorStatus, updateTranslationEditorStatus] = useState({
     showEditor: false,
@@ -96,15 +97,14 @@ function App(props) {
     currentFilename: "",
   });
 
-  const [translationData, updateTranslationData] = useState(' ')
-  const [translationKey, updateTranslationKey] = useState('')
-  const [fileStatus, updateFileStatus] = useState(true)
-
+  const [translationData, updateTranslationData] = useState(" ");
+  const [translationKey, updateTranslationKey] = useState("");
+  const [fileStatus, updateFileStatus] = useState(true);
 
   const showEditor = translationEditorStatus.showEditor;
   //const primaryKey = translationEditorStatus.primaryKey;
   //const sortKey = translationEditorStatus.sortKey;
-   //const translateData = translationEditorStatus.translateData;
+  //const translateData = translationEditorStatus.translateData;
   //const currentFilename = translationEditorStatus.currentFilename;
 
   const [jobState, updateJobState] = useState({
@@ -125,13 +125,15 @@ function App(props) {
 
   function onFileChange(e) {
     file = e.target.files[0];
-    let fileName = file.name
-    let fileExt = fileName.substring(fileName.lastIndexOf(".")+1, fileName.length);
-    if (allowedExts.indexOf(fileExt) !== -1){
-      updateFileStatus(true)
-    }
-    else{
-      updateFileStatus(false)
+    let fileName = file.name;
+    let fileExt = fileName.substring(
+      fileName.lastIndexOf(".") + 1,
+      fileName.length
+    );
+    if (allowedExts.indexOf(fileExt) !== -1) {
+      updateFileStatus(true);
+    } else {
+      updateFileStatus(false);
     }
   }
 
@@ -222,13 +224,16 @@ function App(props) {
 
   const alert = useAlert();
 
-
   function searchKeyphrases() {
-    console.log('keyphrase')
-    console.log(keyphrase)
+    console.log("keyphrase");
+    console.log(keyphrase);
     Auth.currentSession().then((data) => {
       searchPayload["username"] = data["accessToken"]["payload"]["username"];
-      const finalSearchPayload = {'username':searchPayload['username'], 'translateTarget': searchPayload['targetLanguage'], 'keyphrase':keyphrase}
+      const finalSearchPayload = {
+        username: searchPayload["username"],
+        translateTarget: searchPayload["targetLanguage"],
+        keyphrase: keyphrase,
+      };
       axios
         .post(searchApi, finalSearchPayload)
         .then((response) => {
@@ -238,12 +243,9 @@ function App(props) {
         .catch((error) => {
           console.log(error);
         });
-  updateKeyphraseSearchStatus(!showKeyphraseSearchStatus)
-      
-  })
-}
-
-  
+      updateKeyphraseSearchStatus(!showKeyphraseSearchStatus);
+    });
+  }
 
   function showAlert() {
     axios
@@ -293,33 +295,34 @@ function App(props) {
     a.click();
   }
 
-  async function editTranslation(key){
-    portalStatus(true)
-    updateTranslationKey(key)
+  async function editTranslation(key) {
+    portalStatus(true);
+    updateTranslationKey(key);
     //console.log(key)
-    const signedURL = await Storage.get(key,{ download: true , cacheControl: 'no-cache'});
-    signedURL.Body.text().then(string => { 
-      updateTranslationData(string)
+    const signedURL = await Storage.get(key, {
+      download: true,
+      cacheControl: "no-cache",
+    });
+    signedURL.Body.text().then((string) => {
+      updateTranslationData(string);
     });
     //console.log(translationData)
   }
 
-  async function handleTranslationUpload(){
-    const key = translationKey
+  async function handleTranslationUpload() {
+    const key = translationKey;
     //console.log(key)
 
-    const result = await Storage.put(key, translationData,
-      {
-        progressCallback(progress) {
-            console.log(`Uploaded: ${progress.loaded}/${progress.total}`);
+    const result = await Storage.put(key, translationData, {
+      progressCallback(progress) {
+        console.log(`Uploaded: ${progress.loaded}/${progress.total}`);
       },
-    }); 
-    editTranslation(key)
-    portalStatus(false)
+    });
+    editTranslation(key);
+    portalStatus(false);
     //console.log("result")
     //console.log(result)
     //console.log(translationData)
-
   }
 
   function portalStatus(portalState) {
@@ -332,15 +335,13 @@ function App(props) {
 
   const handleTranslationChange = (event) => {
     updateTranslationData(event.target.value);
-    console.log("called")
+    console.log("called");
   };
 
   const handleKeyphraseChange = (event) => {
     updateKeyphrase(event.target.value);
-    console.log("called")
+    console.log("called");
   };
-
-
 
   function showTable() {
     const newRows = jobState.jobs.map((job) => {
@@ -459,13 +460,17 @@ function App(props) {
                 ) : null}
                 {!fileStatus ? (
                   <p>
-                  <Header as="h4" inverted color="grey">
-                  Invalid file type!
-                </Header>
+                    <Header as="h4" inverted color="grey">
+                      Invalid file type!
+                    </Header>
                   </p>
                 ) : null}
                 <p>
-                  <Button disabled={!fileStatus} onClick={onSubmit} className="InputFileButton">
+                  <Button
+                    disabled={!fileStatus}
+                    onClick={onSubmit}
+                    className="InputFileButton"
+                  >
                     Submit
                   </Button>{" "}
                   <Button
@@ -528,43 +533,54 @@ function App(props) {
                     <Button onClick={onSignOut} className="InputFileButton">
                       Sign Out
                     </Button>{" "}
-                    <Button onClick={() => updateKeyphraseSearchStatus(!showKeyphraseSearchStatus)} className="InputFileButton">
+                    <Button
+                      onClick={() =>
+                        updateKeyphraseSearchStatus(!showKeyphraseSearchStatus)
+                      }
+                      className="InputFileButton"
+                    >
                       Search
                     </Button>
                   </p>
                   <div>
                     <Modal open={showEditor}>
                       <Segment>
-                      Editor
+                        Editor
                         <Form>
-                          <TextArea value={translationData} onChange={handleTranslationChange} />
-                       
-                        <Button onClick={handleTranslationUpload}>
-                          Upload translation
-                        </Button>
+                          <TextArea
+                            value={translationData}
+                            onChange={handleTranslationChange}
+                          />
+
+                          <Button onClick={handleTranslationUpload}>
+                            Upload translation
+                          </Button>
                         </Form>
                       </Segment>
                     </Modal>
                   </div>
                   <div>
-                  <Modal open={showKeyphraseSearchStatus}>
-                    <Segment>
-                    Editor
-                      <Form>
-                      <TextArea placeholder='Enter keyphrase' onChange={handleKeyphraseChange} />
-                     
-                      <Button onClick={searchKeyphrases}>
-                        Search
-                      </Button>
-                      <Dropdown
-                      options={options}
-                      onChange={_searchTargetLanguageChosen}
-                      placeholder="Choose from dropdown"
-                    />
-                      </Form>
-                    </Segment>
-                  </Modal>
-                </div>
+                    <Modal open={showKeyphraseSearchStatus}>
+                      <Segment>
+                        Editor 
+                        <Button onClick={updateKeyphraseSearchStatus(false)}>Search</Button>
+                        <Form>
+                        <Dropdown
+                        options={options}
+                        onChange={_searchTargetLanguageChosen}
+                        placeholder="Choose from dropdown"
+                      />
+                          <TextArea
+                            placeholder="Enter keyphrase"
+                            onChange={handleKeyphraseChange}
+                          />
+
+                          <Button onClick={searchKeyphrases}>Search</Button>
+
+                        </Form>
+                      </Segment>
+                    </Modal>
+                  </div>
                 </div>
               </div>
             ))}
