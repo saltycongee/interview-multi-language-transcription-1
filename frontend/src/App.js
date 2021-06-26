@@ -563,7 +563,7 @@ function App(props) {
                     <Modal open={showKeyphraseSearchStatus}>
                       <Segment>
                         Editor 
-                        <Button onClick={updateKeyphraseSearchStatus(false)}>Search</Button>
+                        <Button onClick={() => updateKeyphraseSearchStatus(false)}><Icon name='close'/></Button>
                         <Form>
                         <Dropdown
                         options={options}
