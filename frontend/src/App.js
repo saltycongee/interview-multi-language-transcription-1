@@ -528,7 +528,7 @@ function App(props) {
                               <Icon name="chevron left" />
                             </Menu.Item>
                             <Menu.Item as="a" onClick={() => updateKeyphraseSearchStatus(1)}>1</Menu.Item>
-                            <Menu.Item as="a" onClick={() => updateKeyphraseSearchStatus(1)}>>2</Menu.Item>
+                            <Menu.Item as="a" onClick={() => updateKeyphraseSearchStatus(1)}>2</Menu.Item>
                             <Menu.Item as="a">3</Menu.Item>
                             <Menu.Item as="a">4</Menu.Item>
                             <Menu.Item as="a" icon>
