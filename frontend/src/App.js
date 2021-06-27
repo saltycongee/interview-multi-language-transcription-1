@@ -347,6 +347,17 @@ function App(props) {
     });
   }
 
+  function showPanigation(){
+    var returnString =''
+    for (let i = 1; i <= totalPages; i++){
+      returnString += '<Menu.Item as="a" onClick={() => updateCurrentPage(' + i + ')}>' + i + '</Menu.Item>'
+
+      }
+
+    console.log(returnString)
+    return returnString
+  }
+
   const handleTranslationChange = (event) => {
     updateTranslationData(event.target.value);
     console.log("called");
@@ -527,10 +538,9 @@ function App(props) {
                             <Menu.Item as="a" icon>
                               <Icon name="chevron left" />
                             </Menu.Item>
-                            <Menu.Item as="a" onClick={() => updateKeyphraseSearchStatus(1)}>1</Menu.Item>
-                            <Menu.Item as="a" onClick={() => updateKeyphraseSearchStatus(2)}>2</Menu.Item>
-                            <Menu.Item as="a">3</Menu.Item>
-                            <Menu.Item as="a">4</Menu.Item>
+                            <Menu.Item as="a" onClick={() => updateCurrentPage(1)}>1</Menu.Item>
+                            <Menu.Item as="a" onClick={() => updateCurrentPage(2)}>2</Menu.Item>
+                            {showPanigation()}
                             <Menu.Item as="a" icon>
                               <Icon name="chevron right" />
                             </Menu.Item>
