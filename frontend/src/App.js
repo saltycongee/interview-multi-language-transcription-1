@@ -348,11 +348,12 @@ function App(props) {
   }
 
   function showPanigation(){
-    var returnString =''
+    var returnString ='<div>'
     for (let i = 1; i <= totalPages; i++){
       returnString += '<Menu.Item as="a" onClick={() => updateCurrentPage(' + i + ')}>' + i + '</Menu.Item>'
-
       }
+
+    returnString += '</div'
 
     console.log(returnString)
     return returnString
