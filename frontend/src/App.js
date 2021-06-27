@@ -245,7 +245,7 @@ function App(props) {
         .then((response) => {
           updateSearchedFiles(response)
           updateShowAllStatus(false)
-          console.log(response);
+          console.log(searchedFiles);
 
           
         })
@@ -353,7 +353,7 @@ function App(props) {
   };
 
   function showTable() {
-    const newRows = jobState.jobs.filter((job) => (showAllStatus === true || searchedFiles.includes(job[""]) )).map((job) => {
+    const newRows = jobState.jobs.filter((job) => ((showAllStatus === true) || (searchedFiles.includes(job["fileName"])) )).map((job) => {
       console.log("job");
       console.log(job);
       let tokens = job.transcriptionUrl.split("/").slice(4);
