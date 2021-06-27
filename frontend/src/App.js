@@ -81,9 +81,15 @@ function App(props) {
     showStatus: false,
   });
 
+
+
   const [showUploadFormStatus, updateUploadFormStatus] = useState({
     showUploadForm: false,
   });
+
+  const [showSearchPageStatus, updateSearchPageStatus] = useState(false)
+  const [searchedFiles, updateSearchedFiles] = useState([])
+  const [showAllStatus, updateShowAllStatus] = useState(true)
 
   const [showKeyphraseSearchStatus, updateKeyphraseSearchStatus] =
     useState(false);
@@ -237,8 +243,11 @@ function App(props) {
       axios
         .post(searchApi, finalSearchPayload)
         .then((response) => {
+          updateSearchedFiles(response)
+          updateShowAllStatus(false)
           console.log(response);
-          console.log(response);
+
+          
         })
         .catch((error) => {
           console.log(error);
@@ -321,7 +330,7 @@ function App(props) {
     editTranslation(key);
     portalStatus(false);
     //console.log("result")
-    //console.log(result)
+    console.log(result)
     //console.log(translationData)
   }
 
@@ -403,9 +412,9 @@ function App(props) {
   }
 
   return (
-    <Grid style={{ width: "100vw", height: "100vh" }}>
-      <Grid.Row style={{ width: "100vw", height: "100vh" }}>
-        <Grid.Column style={{ width: "100vw", height: "100vh" }}>
+    <Grid>
+      <Grid.Row>
+        <Grid.Column>
           {currentLoginState !== "signedIn" && (
             /* Login component options:
              * [animateTitle: true, false]
@@ -416,7 +425,7 @@ function App(props) {
             <Login
               animateTitle={true}
               type={"video"}
-              title={"Transcribe & Translate"}
+              title={"T2 - Translate & Transcribe"}
               darkMode={true}
             />
           )}
