@@ -353,7 +353,7 @@ function App(props) {
   };
 
   function showTable() {
-    const newRows = jobState.jobs.filter((values) => (showAllStatus === true || searchedFiles.includes(values) )).map((job) => {
+    const newRows = jobState.jobs.filter((job) => (showAllStatus === true || searchedFiles.includes(job[""]) )).map((job) => {
       console.log("job");
       console.log(job);
       let tokens = job.transcriptionUrl.split("/").slice(4);
