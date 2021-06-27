@@ -91,6 +91,10 @@ function App(props) {
   const [searchedFiles, updateSearchedFiles] = useState([])
   const [showAllStatus, updateShowAllStatus] = useState(true)
 
+  const [maxPerPage, updateMaxPerPage] = useState(2)
+  const [currentPage, updateCurrentPage] = useState(1)
+  const [totalPages, updateTotalPages] = useState(1)
+
   const [showKeyphraseSearchStatus, updateKeyphraseSearchStatus] =
     useState(false);
   const [keyphrase, updateKeyphrase] = useState(" ");
@@ -245,6 +249,7 @@ function App(props) {
         .then((response) => {
           updateSearchedFiles(response['data'])
           updateShowAllStatus(false)
+          
           console.log(searchedFiles);
 
           
@@ -353,10 +358,12 @@ function App(props) {
   };
 
   function showTable() {
-    console.log('type')
-    console.log(searchedFiles)
-    console.log(typeof searchedFiles)
-    const newRows = jobState.jobs.filter((job) => ((showAllStatus === true) || (searchedFiles.includes(job["fileName"])) )).map((job) => {
+    if (searchedFiles === []){
+    updateTotalPages(Math.ceil((jobState.jobs.length)/maxPerPage))
+    }
+  
+
+    const newRows = jobState.jobs.filter((job, index) => (((showAllStatus === true) && ((index/maxPerPage) < currentPage)) || (searchedFiles.includes(job["fileName"])) )).map((job) => {
       console.log("job");
       console.log(job);
       let tokens = job.transcriptionUrl.split("/").slice(4);
@@ -520,8 +527,8 @@ function App(props) {
                             <Menu.Item as="a" icon>
                               <Icon name="chevron left" />
                             </Menu.Item>
-                            <Menu.Item as="a">1</Menu.Item>
-                            <Menu.Item as="a">2</Menu.Item>
+                            <Menu.Item as="a" onClick={() => updateKeyphraseSearchStatus(1)}>1</Menu.Item>
+                            <Menu.Item as="a" onClick={() => updateKeyphraseSearchStatus(1)}>>2</Menu.Item>
                             <Menu.Item as="a">3</Menu.Item>
                             <Menu.Item as="a">4</Menu.Item>
                             <Menu.Item as="a" icon>
