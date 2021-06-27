@@ -243,7 +243,7 @@ function App(props) {
       axios
         .post(searchApi, finalSearchPayload)
         .then((response) => {
-          updateSearchedFiles(response)
+          updateSearchedFiles(response['data'])
           updateShowAllStatus(false)
           console.log(searchedFiles);
 
