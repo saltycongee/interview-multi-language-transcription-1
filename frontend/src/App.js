@@ -353,6 +353,8 @@ function App(props) {
   };
 
   function showTable() {
+    console.log('type')
+    console.log(typeof searchedFiles)
     const newRows = jobState.jobs.filter((job) => ((showAllStatus === true) || (searchedFiles.includes(job["fileName"])) )).map((job) => {
       console.log("job");
       console.log(job);
