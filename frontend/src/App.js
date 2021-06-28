@@ -350,7 +350,7 @@ function App(props) {
   function showPanigation(){
     var returnString = []
     for (let i = 0; i <= totalPages; i++){
-      returnString.push(<Menu.Item as="a" onClick={() => updateCurrentPage(' + i + ')}>' + i + '</Menu.Item>)
+      returnString.push(<Menu.Item as="a" onClick={() => updateCurrentPage(  i  )}>  i  </Menu.Item>)
       }
 
 
@@ -374,7 +374,7 @@ function App(props) {
     }
   
 
-    const newRows = jobState.jobs.filter((job, index) => (((showAllStatus === true) && ((index/maxPerPage) < currentPage)) || (searchedFiles.includes(job["fileName"])) )).map((job) => {
+    const newRows = jobState.jobs.filter((job, index) => (((showAllStatus === true) && (((index/maxPerPage) < currentPage) && ((index/maxPerPage) >= (currentPage -1)))) ) || (searchedFiles.includes(job["fileName"])) )).map((job) => {
       console.log("job");
       console.log(job);
       let tokens = job.transcriptionUrl.split("/").slice(4);
