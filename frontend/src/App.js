@@ -87,7 +87,6 @@ function App(props) {
     showUploadForm: false,
   });
 
-  const [showSearchPageStatus, updateSearchPageStatus] = useState(false)
   const [searchedFiles, updateSearchedFiles] = useState([])
   const [showAllStatus, updateShowAllStatus] = useState(true)
 
@@ -349,8 +348,8 @@ function App(props) {
 
   function showPanigation(){
     var returnString = []
-    for (let i = 0; i <= totalPages; i++){
-      returnString.push(<Menu.Item onClick={() => updateCurrentPage(  {i}  )}>  {i}  </Menu.Item>)
+    for (let i = 1; i <= totalPages; i++){
+      returnString.push(<Menu.Item onClick={() => {updateCurrentPage(  i  ); console.log(currentPage)}}>  {i}  </Menu.Item>)
       }
 
 
@@ -370,7 +369,9 @@ function App(props) {
 
   function showTable() {
     if (searchedFiles === []){
-    updateTotalPages(Math.ceil((jobState.jobs.length)/maxPerPage))
+    updateTotalPages((Math.ceil((jobState.jobs.length)/maxPerPage)) + 1)
+    console.log('total pages')
+    console.log(totalPages)
     }
   
 
@@ -538,8 +539,6 @@ function App(props) {
                             <Menu.Item as="a" icon>
                               <Icon name="chevron left" />
                             </Menu.Item>
-                            <Menu.Item as="a" onClick={() => updateCurrentPage(1)}>1</Menu.Item>
-                            <Menu.Item as="a" onClick={() => updateCurrentPage(2)}>2</Menu.Item>
                             {showPanigation()}
                             <Menu.Item as="a" icon>
                               <Icon name="chevron right" />
@@ -591,8 +590,8 @@ function App(props) {
                   <div>
                     <Modal open={showKeyphraseSearchStatus}>
                       <Segment>
-                        Editor 
-                        <Button onClick={() => updateKeyphraseSearchStatus(false)} floated={'right'}><Icon name='close'/></Button>
+                        Keyword Search
+                        <Button onClick={() => updateKeyphraseSearchStatus(false)} floated={'right'} circular><Icon name='close'/></Button>
                         <Form>
                         <Dropdown
                         options={options}
