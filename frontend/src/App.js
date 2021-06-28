@@ -350,7 +350,7 @@ function App(props) {
   function showPanigation(){
     var returnString = []
     for (let i = 0; i <= totalPages; i++){
-      returnString.push(<Menu.Item as="a" onClick={() => updateCurrentPage(  i  )}>  i  </Menu.Item>)
+      returnString.push(<Menu.Item onClick={() => updateCurrentPage(  {i}  )}>  {i}  </Menu.Item>)
       }
 
 
