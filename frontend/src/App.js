@@ -63,6 +63,15 @@ function App(props) {
     { value: "fr", label: "French" },
     { value: "es", label: "Spanish" },
     { value: "de", label: "German" },
+    { value: "it", label: "Italian" },
+    { value: "pt", label: "Portuguese" },
+    { value: "ja", label: "Japanese" },
+    { value: "ko", label: "Korean" },
+    { value: "hi", label: "Hindi" },
+    { value: "ar", label: "Arabic" },
+    { value: "zh", label: "Chinese (simplified)" },
+    { value: "zh-TW", label: "Chinese (traditional)" },
+
   ];
 
   let file;
@@ -375,7 +384,13 @@ function App(props) {
     console.log(currentPage)
 
     if (searchedFiles === []){
-    updateTotalPages((Math.ceil((jobState.jobs.length)/maxPerPage)) + 1)
+    try{
+      updateTotalPages((Math.ceil((jobState.jobs.length)/maxPerPage)))
+    }
+    catch(err){
+      updateTotalPages(1)
+    }
+    
     console.log('total pages')
     console.log(totalPages)
     }
