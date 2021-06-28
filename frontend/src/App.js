@@ -348,7 +348,7 @@ function App(props) {
 
   function showPanigation(){
     var returnString = []
-    for (let i = 1; i <= totalPages; i++){
+    for (let i = 1; i <= (totalPages+1); i++){
       returnString.push(<Menu.Item onClick={() => {updateCurrentPage(  i  ); console.log(currentPage)}}>  {i}  </Menu.Item>)
       }
 
@@ -368,6 +368,12 @@ function App(props) {
   };
 
   function showTable() {
+
+    console.log('total')
+    console.log(totalPages)
+    console.log('currentPage')
+    console.log(currentPage)
+
     if (searchedFiles === []){
     updateTotalPages((Math.ceil((jobState.jobs.length)/maxPerPage)) + 1)
     console.log('total pages')
