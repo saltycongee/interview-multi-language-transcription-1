@@ -58,7 +58,7 @@ function App(props) {
   };
 
   const statusPayload = { username: "" };
-  const options = [
+  const targetOptions = [
     { value: "en", label: "US English" },
     { value: "fr", label: "French" },
     { value: "es", label: "Spanish" },
@@ -71,8 +71,49 @@ function App(props) {
     { value: "ar", label: "Arabic" },
     { value: "zh", label: "Chinese (simplified)" },
     { value: "zh-TW", label: "Chinese (traditional)" },
-
   ];
+
+  const sourceOptions = [
+    { value: "en-US", label: "English (US)" },
+    { value: "fr-FR", label: "French (FR)" },
+    { value: "af-ZA", label: "Afrikaans" },
+    { value: "ar-AE", label: "Arabic (AE)" },
+    { value: "ar-SA", label: "Arabic (SA)" },
+    { value: "cy-GB", label: "Welsh" },
+    { value: "da-DK", label: "Danish" },
+    { value: "de-CH", label: "German (CH)" },
+    { value: "de-DE", label: "German (DE)" },
+    { value: "en-AB", label: "English (AB)" },
+    { value: "en-AU", label: "English (AU)" },
+    { value: "en-GB", label: "English (GB)" },
+    
+    { value: "en-IE", label: "English (IE)" },
+    { value: "en-IN", label: "English (IN)" },
+    { value: "en-WL", label: "English (WL)" },
+    { value: "es-ES", label: "Spanish (ES)" },
+    { value: "es-US", label: "Spanish (US)" },
+    { value: "fa-IR", label: "Farsi" },
+    { value: "fr-CA", label: "French (FR)" },
+    { value: "ga-IE", label: "ga-IE" },
+    { value: "gd-GB", label: "Gaelic" },
+    { value: "he-IL", label: "Hebrew" },
+
+    { value: "hi-IN", label: "Hindi" },
+    { value: "id-ID", label: "Indonesian" },
+    { value: "it-IT", label: "Italian" },
+    { value: "ja-JP", label: "Japanese" },
+    { value: "ko-KR", label: "Korean" },
+    { value: "ms-MY", label: "Malay" },
+    { value: "nl-NL", label: "Dutch" },
+    { value: "pt-BR", label: "Portuguese (BR)" },
+    { value: "pt-PT", label: "Portuguese (PT)" },
+    { value: "ru-RU", label: "Russian" },
+
+    { value: "ta-IN", label: "Tamil" },
+    { value: "te-IN", label: "Telugu" },
+    { value: "tr-TR", label: "Turkish" },
+    { value: "zh-CN", label: "Chinese (S)" },
+  ]
 
   let file;
   let job_name;
@@ -480,9 +521,10 @@ function App(props) {
                     Translate from
                   </Header>
                   <Dropdown
-                    options={options}
+                    options={sourceOptions}
                     onChange={_sourceLanguageChosen}
                     placeholder="Choose from dropdown"
+                    search
                   />
                 </p>
                 <p>
@@ -491,9 +533,10 @@ function App(props) {
                   </Header>
 
                   <Dropdown
-                    options={options}
+                    options={targetOptions}
                     onChange={_targetLanguageChosen}
                     placeholder="Choose from dropdown"
+                    search
                   />
                 </p>
                 <p>
@@ -615,9 +658,10 @@ function App(props) {
                         <Button onClick={() => updateKeyphraseSearchStatus(false)} floated={'right'} circular><Icon name='close'/></Button>
                         <Form>
                         <Dropdown
-                        options={options}
+                        options={targetOptions}
                         onChange={_searchTargetLanguageChosen}
                         placeholder="Choose from dropdown"
+                        search
                       />
                           <TextArea
                             placeholder="Enter keyphrase"
