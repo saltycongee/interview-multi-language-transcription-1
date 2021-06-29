@@ -371,7 +371,7 @@ function App(props) {
 */
   async function editTranslation(key) {
     portalStatus(true); //Open editor
-
+    updateTranslationKey(key);
 /*
     console.log('in edit translate')
     console.log(job)
@@ -391,6 +391,8 @@ function App(props) {
 
   async function handleTranslationUpload() {
     const key = translationKey;
+    console.log(key)
+    console.log(key)
 /*
     const updatePayload = {
       username: translationKeyUsername,
