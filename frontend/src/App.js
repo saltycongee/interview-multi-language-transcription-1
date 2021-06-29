@@ -12,6 +12,7 @@ import {
   Form,
   TextArea,
   Segment,
+  Dropdown
 } from "semantic-ui-react";
 import Login from "./Components/Authentication/Login";
 import { Hub } from "aws-amplify";
@@ -21,7 +22,7 @@ import { updateLoginState } from "./Actions/loginActions";
 import "react-dropdown/style.css";
 import axios from "axios";
 import { useAlert } from "react-alert";
-import Dropdown from "react-dropdown";
+//import Dropdown from "react-dropdown";
 
 function App(props) {
   // From AWS
