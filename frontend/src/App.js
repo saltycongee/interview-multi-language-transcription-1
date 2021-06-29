@@ -495,6 +495,7 @@ function App(props) {
           //Not started
           translateStatus = <Icon name="pause circle" />;
         } else {
+          job.translateKey = translateKey
           translateStatus = (
             <div>
               <Button onClick={() => downloadData(translateKey)}>
