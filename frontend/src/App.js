@@ -359,7 +359,7 @@ function App(props) {
     //console.log(a);
     a.click();
   }
-
+```
   function beforeEditTranslation(job){
     updateTranslationKey(job['translateKey']);
     updateTranslationKeyUsername(job['username']); //Update state for current translation data key
@@ -368,18 +368,18 @@ function App(props) {
     editTranslation(job)
 
 }
-
-  async function editTranslation(job) {
+```
+  async function editTranslation(key) {
     portalStatus(true); //Open editor
 
-    
+    ```
     console.log('in edit translate')
     console.log(job)
     console.log(job['translateKey'])
     console.log(job.translateKey)
     console.log(translationKey)
-
-    const signedURL = await Storage.get(translationKey, {
+```
+    const signedURL = await Storage.get(key, {
       download: true,
       cacheControl: "no-cache",
     }); //Get txt from S3
@@ -390,35 +390,36 @@ function App(props) {
   }
 
   async function handleTranslationUpload() {
-    console.log('handle')
+    const key = translationKey;
+```
     const updatePayload = {
       username: translationKeyUsername,
       translateTarget: translationKeyLanguage,
       s3url: translationKey,
       fileName: translationKeyFileName,
     };
-
+```
     //console.log(translationKey)
 
-    const result = await Storage.put(translationKey, translationData, {
+    const result = await Storage.put(key, translationData, {
       progressCallback(progress) {
         console.log(`Uploaded: ${progress.loaded}/${progress.total}`);
       },
     });
-    editTranslation(translationKey);
+    editTranslation(key);
     portalStatus(false);
-
+```
     axios
       .post(updateTranslationApi, updatePayload)
-      .then((response2) => {
+      .then((response) => {
         console.log("response from update");
-        console.log(response2);
+        console.log(response);
       })
       .catch((error) => {
         console.log('error from update')
         console.log(error);
       });
-
+```
     console.log("result from trans upload");
     console.log(result);
   }
@@ -502,7 +503,6 @@ function App(props) {
           //Not started
           translateStatus = <Icon name="pause circle" />;
         } else {
-          job.translateKey = translateKey
           translateStatus = (
             <div>
               <Button onClick={() => downloadData(translateKey)}>
@@ -510,7 +510,7 @@ function App(props) {
                 <Icon name="download" />{" "}
               </Button>
 
-              <Button onClick={() => {beforeEditTranslation(job)}}>Edit</Button>
+              <Button onClick={() => {editTranslation(translateKey)}}>Edit</Button>
             </div>
           );
         }
