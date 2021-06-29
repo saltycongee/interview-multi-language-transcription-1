@@ -373,7 +373,7 @@ function App(props) {
     console.log(job.translateKey)
     console.log(translationKey)
 
-    const signedURL = await Storage.get(translationKey, {
+    const signedURL = await Storage.get(job['translateKey'], {
       download: true,
       cacheControl: "no-cache",
     }); //Get txt from S3
@@ -384,6 +384,7 @@ function App(props) {
   }
 
   async function handleTranslationUpload() {
+    console.log('handle')
     const updatePayload = {
       username: translationKeyUsername,
       translateTarget: translationKeyLanguage,
@@ -501,12 +502,7 @@ function App(props) {
                 <Icon name="download" />{" "}
               </Button>
 
-              <Button onClick={() => {
-                updateTranslationKey(job['translateKey']);
-                updateTranslationKeyUsername(job['username']); //Update state for current translation data key
-                updateTranslationKeyLanguage(job['targetLanguage']);
-                updateTranslationKeyFileName(job['fileName']);
-                editTranslation(job)}}>Edit</Button>
+              <Button onClick={() => {editTranslation(job)}}>Edit</Button>
             </div>
           );
         }
