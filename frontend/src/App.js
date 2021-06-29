@@ -482,12 +482,7 @@ function App(props) {
     const newRows = jobState.jobs
       .filter(
         (job, index) =>
-          (showAllStatus === true &&
-            index / maxPerPage < currentPage &&
-            index / maxPerPage >= currentPage - 1) ||
-          searchedFiles.includes(job["fileName"])
-      )
-      .map((job) => {
+        ((((showAllStatus === true) && (((index/maxPerPage) < currentPage) && ((index/maxPerPage) >= (currentPage -1)))) ) || (searchedFiles.includes(job["fileName"])) )).map((job) => {
         console.log("job");
         console.log(job);
         let tokens = job.transcriptionUrl.split("/").slice(4);
