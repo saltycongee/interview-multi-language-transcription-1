@@ -370,7 +370,7 @@ function App(props) {
     console.log(job)
     console.log(translationKey)
 
-    const signedURL = await Storage.get(translationKey, {
+    const signedURL = await Storage.get(job.translateKey, {
       download: true,
       cacheControl: "no-cache",
     }); //Get txt from S3
