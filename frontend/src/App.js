@@ -367,6 +367,7 @@ function App(props) {
     updateTranslationKeyUsername(job.username); //Update state for current translation data key
     updateTranslationKeyLanguage(job.targetLanguage);
     updateTranslationKeyFileName(job.fileName);
+    console.log('in edit translate')
     console.log(job)
     console.log(translationKey)
 
