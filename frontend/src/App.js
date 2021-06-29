@@ -157,8 +157,8 @@ function App(props) {
   });
 
   const [translationData, updateTranslationData] = useState(" ");
-  const [translationKey, updateTranslationKey] = useState("");
-  const [translationKeyUsername, updateTranslationKeyUsername] = useState("");
+  const [translationKey, updateTranslationKey] = useState(" ");
+  const [translationKeyUsername, updateTranslationKeyUsername] = useState(" ");
   const [translationKeyLanguage, updateTranslationKeyLanguage] = useState("");
   const [translationKeyFileName, updateTranslationKeyFileName] = useState("");
 
@@ -501,7 +501,12 @@ function App(props) {
                 <Icon name="download" />{" "}
               </Button>
 
-              <Button onClick={() => editTranslation(job)}>Edit</Button>
+              <Button onClick={() => {
+                updateTranslationKey(job['translateKey']);
+                updateTranslationKeyUsername(job['username']); //Update state for current translation data key
+                updateTranslationKeyLanguage(job['targetLanguage']);
+                updateTranslationKeyFileName(job['fileName']);
+                editTranslation(job)}}>Edit</Button>
             </div>
           );
         }
