@@ -379,7 +379,7 @@ function App(props) {
     console.log(job.translateKey)
     console.log(translationKey)
 
-    const signedURL = await Storage.get(job['translateKey'], {
+    const signedURL = await Storage.get(translationKey, {
       download: true,
       cacheControl: "no-cache",
     }); //Get txt from S3
@@ -410,11 +410,12 @@ function App(props) {
 
     axios
       .post(updateTranslationApi, updatePayload)
-      .then((response) => {
+      .then((response2) => {
         console.log("response from update");
-        console.log(response);
+        console.log(response2);
       })
       .catch((error) => {
+        console.log('error from update')
         console.log(error);
       });
 
