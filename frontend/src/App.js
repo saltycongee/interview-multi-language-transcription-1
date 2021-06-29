@@ -367,8 +367,10 @@ function App(props) {
     updateTranslationKeyUsername(job.username); //Update state for current translation data key
     updateTranslationKeyLanguage(job.targetLanguage);
     updateTranslationKeyFileName(job.fileName);
-    //console.log(key)
-    const signedURL = await Storage.get(job.translateKey, {
+    console.log(job)
+    console.log(translationKey)
+
+    const signedURL = await Storage.get(translationKey, {
       download: true,
       cacheControl: "no-cache",
     }); //Get txt from S3
