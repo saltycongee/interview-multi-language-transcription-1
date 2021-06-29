@@ -11,8 +11,7 @@ import {
   Modal,
   Form,
   TextArea,
-  Segment,
-  Dropdown
+  Segment
 } from "semantic-ui-react";
 import Login from "./Components/Authentication/Login";
 import { Hub } from "aws-amplify";
@@ -22,7 +21,7 @@ import { updateLoginState } from "./Actions/loginActions";
 import "react-dropdown/style.css";
 import axios from "axios";
 import { useAlert } from "react-alert";
-//import Dropdown from "react-dropdown";
+import Dropdown from "react-dropdown";
 
 function App(props) {
   // From AWS
@@ -384,14 +383,13 @@ function App(props) {
     });
     editTranslation(key);
     portalStatus(false);
-    //console.log("result")
+    console.log("result from trans upload")
     console.log(result)
-    //console.log(translationData)
+
   }
 
   function portalStatus(portalState) {
-    //console.log("portalstatus changed");
-    //console.log(showEditor);
+
     updateTranslationEditorStatus((prevState) => {
       return { ...prevState, showEditor: portalState };
     });
@@ -639,6 +637,7 @@ function App(props) {
                     <Modal open={showEditor}>
                       <Segment>
                         Editor
+                        <Button onClick={() => portalStatus(false)} floated={'right'} circular><Icon name='close'/></Button>
                         <Form>
                           <TextArea
                             value={translationData}
