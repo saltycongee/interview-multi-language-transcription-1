@@ -363,17 +363,17 @@ function App(props) {
   async function editTranslation(job) {
     portalStatus(true); //Open editor
 
-    updateTranslationKey(job.translateKey);
-    updateTranslationKeyUsername(job.username); //Update state for current translation data key
-    updateTranslationKeyLanguage(job.targetLanguage);
-    updateTranslationKeyFileName(job.fileName);
+    updateTranslationKey(job['translateKey']);
+    updateTranslationKeyUsername(job['username']); //Update state for current translation data key
+    updateTranslationKeyLanguage(job['targetLanguage']);
+    updateTranslationKeyFileName(job['fileName']);
     console.log('in edit translate')
     console.log(job)
     console.log(job['translateKey'])
     console.log(job.translateKey)
     console.log(translationKey)
 
-    const signedURL = await Storage.get(job.translateKey, {
+    const signedURL = await Storage.get(translationKey, {
       download: true,
       cacheControl: "no-cache",
     }); //Get txt from S3
