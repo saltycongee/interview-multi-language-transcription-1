@@ -359,7 +359,7 @@ function App(props) {
     //console.log(a);
     a.click();
   }
-```
+/*
   function beforeEditTranslation(job){
     updateTranslationKey(job['translateKey']);
     updateTranslationKeyUsername(job['username']); //Update state for current translation data key
@@ -368,17 +368,17 @@ function App(props) {
     editTranslation(job)
 
 }
-```
+*/
   async function editTranslation(key) {
     portalStatus(true); //Open editor
 
-    ```
+/*
     console.log('in edit translate')
     console.log(job)
     console.log(job['translateKey'])
     console.log(job.translateKey)
     console.log(translationKey)
-```
+*/
     const signedURL = await Storage.get(key, {
       download: true,
       cacheControl: "no-cache",
@@ -391,14 +391,14 @@ function App(props) {
 
   async function handleTranslationUpload() {
     const key = translationKey;
-```
+/*
     const updatePayload = {
       username: translationKeyUsername,
       translateTarget: translationKeyLanguage,
       s3url: translationKey,
       fileName: translationKeyFileName,
     };
-```
+*/
     //console.log(translationKey)
 
     const result = await Storage.put(key, translationData, {
@@ -408,7 +408,7 @@ function App(props) {
     });
     editTranslation(key);
     portalStatus(false);
-```
+/*
     axios
       .post(updateTranslationApi, updatePayload)
       .then((response) => {
@@ -419,7 +419,7 @@ function App(props) {
         console.log('error from update')
         console.log(error);
       });
-```
+*/
     console.log("result from trans upload");
     console.log(result);
   }
