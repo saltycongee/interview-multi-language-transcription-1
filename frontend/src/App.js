@@ -369,6 +369,8 @@ function App(props) {
     updateTranslationKeyFileName(job.fileName);
     console.log('in edit translate')
     console.log(job)
+    console.log(job['translateKey'])
+    console.log(job.translateKey)
     console.log(translationKey)
 
     const signedURL = await Storage.get(job.translateKey, {
