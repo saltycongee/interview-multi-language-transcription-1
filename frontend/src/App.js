@@ -140,7 +140,7 @@ function App(props) {
   const [searchedFiles, updateSearchedFiles] = useState([]);
   const [showAllStatus, updateShowAllStatus] = useState(true);
 
-  const [maxPerPage, updateMaxPerPage] = useState(2);
+  const [maxPerPage, updateMaxPerPage] = useState(10);
   const [currentPage, updateCurrentPage] = useState(1);
   const [totalPages, updateTotalPages] = useState(1);
 
@@ -360,13 +360,19 @@ function App(props) {
     a.click();
   }
 
-  async function editTranslation(job) {
-    portalStatus(true); //Open editor
-
+  function beforeEditTranslation(job){
     updateTranslationKey(job['translateKey']);
     updateTranslationKeyUsername(job['username']); //Update state for current translation data key
     updateTranslationKeyLanguage(job['targetLanguage']);
     updateTranslationKeyFileName(job['fileName']);
+    editTranslation(job)
+
+}
+
+  async function editTranslation(job) {
+    portalStatus(true); //Open editor
+
+    
     console.log('in edit translate')
     console.log(job)
     console.log(job['translateKey'])
@@ -503,7 +509,7 @@ function App(props) {
                 <Icon name="download" />{" "}
               </Button>
 
-              <Button onClick={() => {editTranslation(job)}}>Edit</Button>
+              <Button onClick={() => {beforeEditTranslation(job)}}>Edit</Button>
             </div>
           );
         }
