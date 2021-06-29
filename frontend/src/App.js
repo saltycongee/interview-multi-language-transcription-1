@@ -468,6 +468,9 @@ function App(props) {
     console.log("currentPage");
     console.log(currentPage);
 
+    console.log('searchedFIles')
+    console.log(searchedFiles)
+
     if (searchedFiles === []) {
       try {
         updateTotalPages(Math.ceil(jobState.jobs.length / maxPerPage));
