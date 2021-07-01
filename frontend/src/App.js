@@ -359,16 +359,16 @@ function App(props) {
     //console.log(a);
     a.click();
   }
-/*
+
   function beforeEditTranslation(job){
     updateTranslationKey(job['translateKey']);
     updateTranslationKeyUsername(job['username']); //Update state for current translation data key
     updateTranslationKeyLanguage(job['targetLanguage']);
     updateTranslationKeyFileName(job['fileName']);
-    editTranslation(job)
+    editTranslation(job['translateKey'])
 
 }
-*/
+
   async function editTranslation(key) {
     portalStatus(true); //Open editor
     updateTranslationKey(key);
@@ -507,7 +507,7 @@ function App(props) {
                 <Icon name="download" />{" "}
               </Button>
 
-              <Button onClick={() => {editTranslation(translateKey)}}>Edit</Button>
+              <Button onClick={() => {beforeEditTranslation(job)}}>Edit</Button>
             </div>
           );
         }
