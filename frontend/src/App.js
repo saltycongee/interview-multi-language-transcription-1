@@ -361,6 +361,7 @@ function App(props) {
   }
 
   function beforeEditTranslation(job){
+    console.log(job['fileName'])
     updateTranslationKey(job['translateKey']);
     updateTranslationKeyUsername(job['username']); //Update state for current translation data key
     updateTranslationKeyLanguage(job['targetLanguage']);
