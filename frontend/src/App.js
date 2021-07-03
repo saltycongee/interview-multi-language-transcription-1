@@ -366,7 +366,7 @@ function App(props) {
     updateTranslationKeyLanguage(job['targetLanguage']);
     updateTranslationKeyFileName(job['fileName']);
     console.log("translateKey")
-    console.log(translationKeyFileName)
+    console.log(typeof(translationKeyFileName))
     editTranslation(job['translateKey'])
 
 }
