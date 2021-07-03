@@ -365,6 +365,8 @@ function App(props) {
     updateTranslationKeyUsername(job['username']); //Update state for current translation data key
     updateTranslationKeyLanguage(job['targetLanguage']);
     updateTranslationKeyFileName(job['fileName']);
+    console.log("translateKey")
+    console.log(translationKeyFileName)
     editTranslation(job['translateKey'])
 
 }
@@ -372,13 +374,8 @@ function App(props) {
   async function editTranslation(key) {
     portalStatus(true); //Open editor
     updateTranslationKey(key);
-/*
-    console.log('in edit translate')
-    console.log(job)
-    console.log(job['translateKey'])
-    console.log(job.translateKey)
-    console.log(translationKey)
-*/
+
+
     const signedURL = await Storage.get(key, {
       download: true,
       cacheControl: "no-cache",
