@@ -45,6 +45,10 @@ function App(props) {
   const updateTranslationApi =
     "https://ti7db5ed14.execute-api.us-east-1.amazonaws.com/Stage_1";
 
+
+  let updatePayload ={"input":"{}",
+  "stateMachineArn":"arn:aws:states:us-east-1:313039493322:stateMachine:LaPresse-UpdatedTranslations"}
+
   // Initialisations
 
   const payload = {
@@ -121,6 +125,8 @@ function App(props) {
   let job_name;
   let translateStatus = " ";
 
+  const [currentJob, updateJob] = useState({});
+
   let allowedExts = ["flac", "mp3", "mp4", "ogg", "webm", "amr", "wav"];
 
   //States
@@ -156,19 +162,11 @@ function App(props) {
     currentFilename: "",
   });
 
-  const [translationData, updateTranslationData] = useState(" ");
+  const [translationData, updateTranslationData] = useState('Loading...');
   const [translationKey, updateTranslationKey] = useState(" ");
-  const [translationKeyUsername, updateTranslationKeyUsername] = useState(" ");
-  const [translationKeyLanguage, updateTranslationKeyLanguage] = useState("");
-  const [translationKeyFileName, updateTranslationKeyFileName] = useState("");
-
   const [fileStatus, updateFileStatus] = useState(true);
 
   const showEditor = translationEditorStatus.showEditor;
-  //const primaryKey = translationEditorStatus.primaryKey;
-  //const sortKey = translationEditorStatus.sortKey;
-  //const translateData = translationEditorStatus.translateData;
-  //const currentFilename = translationEditorStatus.currentFilename;
 
   const [jobState, updateJobState] = useState({
     jobs: [],
@@ -352,6 +350,7 @@ function App(props) {
   }
 
   async function downloadData(key) {
+    console.log(key)
     const signedURL = await Storage.get(key);
     let a = document.createElement("a");
     a.href = signedURL;
@@ -360,19 +359,25 @@ function App(props) {
     a.click();
   }
 
-  function beforeEditTranslation(job){
-    console.log(job['fileName'])
-    updateTranslationKey(job['translateKey']);
-    updateTranslationKeyUsername(job['username']); //Update state for current translation data key
-    updateTranslationKeyLanguage(job['targetLanguage']);
-    updateTranslationKeyFileName(job['fileName']);
-    console.log("translateKey")
-    console.log(typeof(translationKeyFileName))
-    editTranslation(job['translateKey'])
+  function beforeEditTranslation(job, translateKey){
+
+    console.log(job)
+    job.s3url = translateKey
+
+    updateJob((prevState) => {
+      console.log("in job update")
+      return {job};
+    })
+
+    console.log(currentJob)
+
+    editTranslation(translateKey)
 
 }
 
   async function editTranslation(key) {
+    console.log('key')
+    console.log(key)
     portalStatus(true); //Open editor
     updateTranslationKey(key);
 
@@ -389,17 +394,9 @@ function App(props) {
 
   async function handleTranslationUpload() {
     const key = translationKey;
-    console.log(key)
-    console.log(key)
-/*
-    const updatePayload = {
-      username: translationKeyUsername,
-      translateTarget: translationKeyLanguage,
-      s3url: translationKey,
-      fileName: translationKeyFileName,
-    };
-*/
-    //console.log(translationKey)
+    console.log(currentJob)
+
+
 
     const result = await Storage.put(key, translationData, {
       progressCallback(progress) {
@@ -408,7 +405,14 @@ function App(props) {
     });
     editTranslation(key);
     portalStatus(false);
-/*
+
+    let translationMetadata = {username:currentJob.job.username, translationTarget: currentJob.job.targetLanguage, fileName:currentJob.job.fileName, s3url:'public/'+currentJob.job.s3url}
+
+    console.log(translationMetadata)
+    updatePayload.input = JSON.stringify(translationMetadata)
+    console.log(typeof(updatePayload.input))
+    
+
     axios
       .post(updateTranslationApi, updatePayload)
       .then((response) => {
@@ -419,7 +423,7 @@ function App(props) {
         console.log('error from update')
         console.log(error);
       });
-*/
+
     console.log("result from trans upload");
     console.log(result);
   }
@@ -432,12 +436,11 @@ function App(props) {
 
   function showPanigation() {
     var returnString = [];
-    for (let i = 1; i <= totalPages + 1; i++) {
+    for (let i = 1; i <= totalPages; i++) {
       returnString.push(
         <Menu.Item
           onClick={() => {
             updateCurrentPage(i);
-            console.log(currentPage);
           }}
         >
           {" "}
@@ -446,28 +449,18 @@ function App(props) {
       );
     }
 
-    console.log(returnString);
     return returnString;
   }
 
   const handleTranslationChange = (event) => {
     updateTranslationData(event.target.value);
-    console.log("called");
   };
 
   const handleKeyphraseChange = (event) => {
     updateKeyphrase(event.target.value);
-    console.log("called");
   };
 
   function showTable() {
-    console.log("total");
-    console.log(totalPages);
-    console.log("currentPage");
-    console.log(currentPage);
-
-    console.log('searchedFIles')
-    console.log(searchedFiles)
 
     if (searchedFiles === []) {
       try {
@@ -476,13 +469,9 @@ function App(props) {
         updateTotalPages(1);
       }
 
-      console.log("total pages");
-      console.log(totalPages);
     }
 
     const newRows = jobState.jobs.filter((job, index) => ((((showAllStatus === true) && (((index/maxPerPage) < currentPage) && ((index/maxPerPage) >= (currentPage -1)))) ) || (searchedFiles.includes(job["fileName"])) )).map((job) => {
-        console.log("job");
-        console.log(job);
         let tokens = job.transcriptionUrl.split("/").slice(4);
         const transcribeKey = tokens.join("/");
         tokens = job.translateKey.split("/").slice(1);
@@ -498,14 +487,17 @@ function App(props) {
           //Not started
           translateStatus = <Icon name="pause circle" />;
         } else {
+          
           translateStatus = (
             <div>
+            <Button.Group fluid compact>
               <Button onClick={() => downloadData(translateKey)}>
                 {" "}
                 <Icon name="download" />{" "}
               </Button>
 
-              <Button onClick={() => {beforeEditTranslation(job)}}>Edit</Button>
+              <Button onClick={() => {console.log(job); console.log(currentJob); beforeEditTranslation(job, translateKey)}} > <Icon name="edit" /></Button>
+              </Button.Group>
             </div>
           );
         }
@@ -513,13 +505,13 @@ function App(props) {
         return (
           <Table.Row>
             <Table.Cell> {job.fileName} </Table.Cell>
-            <Table.Cell>{job.sourceLanguage}</Table.Cell>
-            <Table.Cell>{job.targetLanguage}</Table.Cell>
-            <Table.Cell> {job.status} </Table.Cell>
+            <Table.Cell textAlign='center'>{job.sourceLanguage}</Table.Cell>
+            <Table.Cell textAlign='center'>{job.targetLanguage}</Table.Cell>
+            <Table.Cell textAlign='center'> {job.status} </Table.Cell>
             <Table.Cell>
               {" "}
               {job.transcriptionUrl !== " " ? (
-                <Button onClick={() => downloadData(transcribeKey)}>
+                <Button onClick={() => downloadData(transcribeKey)} compact fluid>
                   {" "}
                   <Icon name="download" />
                 </Button>
@@ -621,14 +613,30 @@ function App(props) {
               </div>
             ) : (
               <div>
+              
                 <div className="TableView">
+                <p className="MenuBar">
+                
+                <Header as='h2' inverted color = 'grey' floated = 'left'>T2 - Transcribe & Translate</Header>
+                
+                <Button circular floated = 'right' compact
+                      onClick={() =>
+                        updateKeyphraseSearchStatus(!showKeyphraseSearchStatus)
+                      }
+                      className="InputFileButton"
+                    >
+                    <Icon name='search' />
+                      Search by keyphrase
+                    </Button>
+                    ' '
+                    </p>
                   <Table
                     celled
                     class="ui inverted black table"
                     className="Table"
                   >
                     <Table.Header>
-                      <Table.Row>
+                      <Table.Row textAlign='center'>
                         <Table.HeaderCell>File Name</Table.HeaderCell>
                         <Table.HeaderCell>Source Language</Table.HeaderCell>
                         <Table.HeaderCell>Target Language</Table.HeaderCell>
@@ -644,12 +652,10 @@ function App(props) {
                         <Table.HeaderCell colSpan="1">
                           <Menu floated="right" pagination>
                             <Menu.Item as="a" icon>
-                              <Icon name="chevron left" />
+                              Page(s)
                             </Menu.Item>
                             {showPanigation()}
-                            <Menu.Item as="a" icon>
-                              <Icon name="chevron right" />
-                            </Menu.Item>
+          
                           </Menu>
                         </Table.HeaderCell>
                       </Table.Row>
@@ -659,44 +665,51 @@ function App(props) {
                     <Button
                       className="InputFileButton"
                       onClick={toggleUploadStatus}
+                      compact circular
                     >
-                      Upload File
+                      
+                         
+                      <Icon name='cloud upload' />
+                      Upload File  
+                      
                     </Button>{" "}
-                    <Button className="InputFileButton" onClick={refreshPage}>
-                      Refresh
+                    <Button className="InputFileButton" onClick={refreshPage} compact circular>
+                    <Icon name='refresh' />
+                    Refresh Table
                     </Button>{" "}
-                    <Button onClick={onSignOut} className="InputFileButton">
-                      Sign Out
+                    <Button onClick={onSignOut} className="InputFileButton" compact circular floated = 'right'>
+                    <Icon name='sign-out' />  
+                    Sign Out
                     </Button>{" "}
-                    <Button
-                      onClick={() =>
-                        updateKeyphraseSearchStatus(!showKeyphraseSearchStatus)
-                      }
-                      className="InputFileButton"
-                    >
-                      Search
-                    </Button>
+                    
                   </p>
                   <div>
                     <Modal open={showEditor}>
                       <Segment>
-                        Editor
-                        <Button
-                          onClick={() => portalStatus(false)}
+                      <p className="MenuBar">
+                      <Header as='h3'>Translation Editor
+                      <Button
+                          onClick={() => {portalStatus(false); updateTranslationData('Loading...')}}
                           floated={"right"}
-                          circular
+                          circular compact
                         >
                           <Icon name="close" />
-                        </Button>
+                        </Button></Header>
+                      
+                        </p>
+                        
                         <Form>
                           <TextArea
                             value={translationData}
                             onChange={handleTranslationChange}
                           />
-
-                          <Button onClick={handleTranslationUpload}>
+                          <p className="MenuBar">
+                          <Button onClick={handleTranslationUpload} compact circular>
                             Upload translation
                           </Button>
+                          
+                          </p>
+                          
                         </Form>
                       </Segment>
                     </Modal>
@@ -704,27 +717,41 @@ function App(props) {
                   <div>
                     <Modal open={showKeyphraseSearchStatus}>
                       <Segment>
-                        Keyword Search
-                        <Button
+                      <p className="MenuBar"> 
+                      <Header as='h3'>Keyword Search
+                      <Button
                           onClick={() => updateKeyphraseSearchStatus(false)}
                           floated={"right"}
-                          circular
+                          circular compact
                         >
                           <Icon name="close" />
-                        </Button>
+                        </Button></Header>
+                        Note: Please enter keyphrases without apostrophes (')
+                      </p>
+
                         <Form>
+                        <p className="MenuBar"> 
                           <Dropdown
                             options={targetOptions}
                             onChange={_searchTargetLanguageChosen}
                             placeholder="Choose from dropdown"
                             search
                           />
+                          <p>
+                          </p>
+                          
+                          
                           <TextArea
                             placeholder="Enter keyphrase"
                             onChange={handleKeyphraseChange}
                           />
-
-                          <Button onClick={searchKeyphrases}>Search</Button>
+                          <p>
+                          </p>
+                          
+                          
+                          <Button onClick={searchKeyphrases} compact circular><Icon name='search' />Search</Button>
+                          </p>
+                          
                         </Form>
                       </Segment>
                     </Modal>
