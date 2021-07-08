@@ -10,6 +10,7 @@ import {
   Table,
   Modal,
   Form,
+  Pagination ,
   TextArea,
   Segment,
 } from "semantic-ui-react";
@@ -49,19 +50,20 @@ function App(props) {
   let updatePayload ={"input":"{}",
   "stateMachineArn":"arn:aws:states:us-east-1:313039493322:stateMachine:LaPresse-UpdatedTranslations"}
 
+  let totalPage = 1
+
   // Initialisations
 
   const payload = {
-    sourceLanguage: "",
-    fileName: "",
-    targetLanguage: "",
+    source_language: "",
+    file_name: "",
+    target_language: "",
     username: "",
   };
 
-  const searchPayload = {
-    username: "",
-    targetLanguage: "",
-  };
+  const [searchPayload, updateSearchPayload] = useState({
+    target_language: ''
+  })
 
   const statusPayload = { username: "" };
   const targetOptions = [
@@ -100,8 +102,6 @@ function App(props) {
     { value: "es-US", label: "Spanish (US)" },
     { value: "fa-IR", label: "Farsi" },
     { value: "fr-CA", label: "French (FR)" },
-    { value: "ga-IE", label: "ga-IE" },
-    { value: "gd-GB", label: "Gaelic" },
     { value: "he-IL", label: "Hebrew" },
 
     { value: "hi-IN", label: "Hindi" },
@@ -146,7 +146,7 @@ function App(props) {
   const [searchedFiles, updateSearchedFiles] = useState([]);
   const [showAllStatus, updateShowAllStatus] = useState(true);
 
-  const [maxPerPage, updateMaxPerPage] = useState(10);
+  const [maxPerPage, updateMaxPerPage] = useState(5);
   const [currentPage, updateCurrentPage] = useState(1);
   const [totalPages, updateTotalPages] = useState(1);
 
@@ -159,7 +159,7 @@ function App(props) {
     primaryKey: "",
     sortKey: "",
     translateData: "",
-    currentFilename: "",
+    currentfile_name: "",
   });
 
   const [translationData, updateTranslationData] = useState('Loading...');
@@ -186,10 +186,10 @@ function App(props) {
 
   function onFileChange(e) {
     file = e.target.files[0];
-    let fileName = file.name;
-    let fileExt = fileName.substring(
-      fileName.lastIndexOf(".") + 1,
-      fileName.length
+    let file_name = file.name;
+    let fileExt = file_name.substring(
+      file_name.lastIndexOf(".") + 1,
+      file_name.length
     );
     if (allowedExts.indexOf(fileExt) !== -1) {
       updateFileStatus(true);
@@ -215,8 +215,8 @@ function App(props) {
     });
   }
 
-  function _sourceLanguageChosen(option) {
-    payload["sourceLanguage"] = option.value;
+  function _source_languageChosen(option) {
+    payload["source_language"] = option.value;
     //console.log("Source Language ", option.value);
   }
 
@@ -239,13 +239,13 @@ function App(props) {
           let newJob = jobState.jobs.slice();
           newJob.push({
             username: payload["username"],
-            fileName: payload["fileName"],
+            file_name: payload["file_name"],
             job_name: job_name.substring(1, job_name.length - 1),
             status: "In progress",
-            transcriptionUrl: " ",
-            translateKey: " ",
-            sourceLanguage: payload["sourceLanguage"],
-            targetLanguage: payload["targetLanguage"],
+            transcription_key: " ",
+            translation_key: " ",
+            source_language: payload["source_language"],
+            target_language: payload["target_language"],
           });
           updateJobState({
             jobs: newJob,
@@ -258,14 +258,17 @@ function App(props) {
     });
   }
 
-  function _targetLanguageChosen(option) {
-    payload["targetLanguage"] = option.value;
+  function _target_languageChosen(option) {
+    payload["target_language"] = option.value;
     //console.log("Target Language ", option.value);
   }
 
-  function _searchTargetLanguageChosen(option) {
-    searchPayload["targetLanguage"] = option.value;
-    //console.log("Target Language ", option.value);
+  function _searchtarget_languageChosen(option) {
+    updateSearchPayload((prevState) => {
+      return { ...prevState, target_language: option.value };
+    })
+    
+    console.log("Target Language ", searchPayload);
   }
 
   async function onSubmit() {
@@ -275,7 +278,7 @@ function App(props) {
           //console.log(`Uploaded: (${progress.loaded}/${progress.total})`);
         },
       });
-      payload.fileName = file.name;
+      payload.file_name = file.name;
       //console.log("Calling api...");
       callApi();
     } catch (err) {
@@ -289,10 +292,10 @@ function App(props) {
     console.log("keyphrase");
     console.log(keyphrase);
     Auth.currentSession().then((data) => {
-      searchPayload["username"] = data["accessToken"]["payload"]["username"];
+
       const finalSearchPayload = {
-        username: searchPayload["username"],
-        translateTarget: searchPayload["targetLanguage"],
+        username: data["accessToken"]["payload"]["username"],
+        translateTarget: searchPayload["target_language"],
         keyphrase: keyphrase,
       };
       axios
@@ -330,23 +333,34 @@ function App(props) {
   }
 
   function fetchData() {
+    
     Auth.currentSession().then((data) => {
       statusPayload["username"] = data["accessToken"]["payload"]["username"];
       //console.log(statusPayload["username"]);
       axios
         .post(scanApi, statusPayload)
         .then((response) => {
+          console.log(response)
           let newJob = JSON.parse(response["data"]["body"]);
+          console.log(newJob)
           newJob = newJob["Items"];
           //console.log(newJob);
           updateJobState({
             jobs: newJob,
           });
+          
         })
         .catch((error) => {
           console.log(error);
         });
     });
+    console.log(jobState)
+    console.log(jobState['jobs'].length)
+
+
+    
+
+    
   }
 
   async function downloadData(key) {
@@ -359,10 +373,10 @@ function App(props) {
     a.click();
   }
 
-  function beforeEditTranslation(job, translateKey){
+  function beforeEditTranslation(job, translation_key){
 
     console.log(job)
-    job.s3url = translateKey
+    job.s3url = translation_key
 
     updateJob((prevState) => {
       console.log("in job update")
@@ -371,7 +385,7 @@ function App(props) {
 
     console.log(currentJob)
 
-    editTranslation(translateKey)
+    editTranslation(translation_key)
 
 }
 
@@ -406,7 +420,7 @@ function App(props) {
     editTranslation(key);
     portalStatus(false);
 
-    let translationMetadata = {username:currentJob.job.username, translationTarget: currentJob.job.targetLanguage, fileName:currentJob.job.fileName, s3url:'public/'+currentJob.job.s3url}
+    let translationMetadata = {username:currentJob.job.username, target_language: currentJob.job.target_language, file_name:currentJob.job.file_name, s3url:'public/'+currentJob.job.s3url}
 
     console.log(translationMetadata)
     updatePayload.input = JSON.stringify(translationMetadata)
@@ -436,7 +450,7 @@ function App(props) {
 
   function showPanigation() {
     var returnString = [];
-    for (let i = 1; i <= totalPages; i++) {
+    for (let i = 1; i <= totalPage; i++) {
       returnString.push(
         <Menu.Item
           onClick={() => {
@@ -460,30 +474,57 @@ function App(props) {
     updateKeyphrase(event.target.value);
   };
 
+
+
+
   function showTable() {
+    console.log(jobState)
 
-    if (searchedFiles === []) {
-      try {
-        updateTotalPages(Math.ceil(jobState.jobs.length / maxPerPage));
-      } catch (err) {
-        updateTotalPages(1);
+    let totalNumberOfFiles = jobState['jobs'].length
+    console.log(jobState['jobs'].length)
+
+    
+      if (totalNumberOfFiles !== 0){
+        totalPage=Math.ceil(jobState['jobs'].length / maxPerPage)
+        
       }
+      else{
+        totalPage = 1
+      }
+    
 
-    }
+  
 
-    const newRows = jobState.jobs.filter((job, index) => ((((showAllStatus === true) && (((index/maxPerPage) < currentPage) && ((index/maxPerPage) >= (currentPage -1)))) ) || (searchedFiles.includes(job["fileName"])) )).map((job) => {
-        let tokens = job.transcriptionUrl.split("/").slice(4);
-        const transcribeKey = tokens.join("/");
-        tokens = job.translateKey.split("/").slice(1);
-        const translateKey = tokens.join("/");
+    const newRows = jobState.jobs.filter((job, index) => ((((showAllStatus === true) && (((index/maxPerPage) < currentPage) && ((index/maxPerPage) >= (currentPage -1)))) ) || (searchedFiles.includes(job["file_name"])) )).map((job) => {
+        console.log(job.transcription_key)
+        let transcription_tokens = ''
+        let translate_tokens = ''
+        let transcribeKey = ''
+        let translateKey = ''
 
-        if (job.translateKey === "In progress") {
+
+        if (job.transcription_key != null){
+          transcription_tokens = job.transcription_key.split("/").slice(4);
+          transcribeKey = transcription_tokens.join("/");
+        }
+
+        
+        
+        
+        if (job.translation_key != null){  
+         translate_tokens = job.translation_key.split("/").slice(1);
+         translateKey = translate_tokens.join("/");
+        }
+        
+        
+
+        if (job.translation_key === "In progress" || job.translation_key === null ) {
           // In progress
           translateStatus = <Icon loading name="spinner" />;
-        } else if (job.translateKey === "Invalid") {
+        } else if (job.translation_key === "Invalid") {
           //Not applicable
           translateStatus = <Icon color="yellow" name="ban" />;
-        } else if (job.translateKey === "Not started") {
+        } else if (job.translation_key === "Not started") {
           //Not started
           translateStatus = <Icon name="pause circle" />;
         } else {
@@ -504,13 +545,13 @@ function App(props) {
 
         return (
           <Table.Row>
-            <Table.Cell> {job.fileName} </Table.Cell>
-            <Table.Cell textAlign='center'>{job.sourceLanguage}</Table.Cell>
-            <Table.Cell textAlign='center'>{job.targetLanguage}</Table.Cell>
+            <Table.Cell> {job['file_name']} </Table.Cell>
+            <Table.Cell textAlign='center'>{job.source_language}</Table.Cell>
+            <Table.Cell textAlign='center'>{job.target_language}</Table.Cell>
             <Table.Cell textAlign='center'> {job.status} </Table.Cell>
             <Table.Cell>
               {" "}
-              {job.transcriptionUrl !== " " ? (
+              {transcribeKey !== '' ? (
                 <Button onClick={() => downloadData(transcribeKey)} compact fluid>
                   {" "}
                   <Icon name="download" />
@@ -557,9 +598,8 @@ function App(props) {
                   </Header>
                   <Dropdown
                     options={sourceOptions}
-                    onChange={_sourceLanguageChosen}
+                    onChange={_source_languageChosen}
                     placeholder="Choose from dropdown"
-                    search
                   />
                 </p>
                 <p>
@@ -569,9 +609,9 @@ function App(props) {
 
                   <Dropdown
                     options={targetOptions}
-                    onChange={_targetLanguageChosen}
+                    onChange={_target_languageChosen}
                     placeholder="Choose from dropdown"
-                    search
+                    search inverted
                   />
                 </p>
                 <p>
@@ -597,16 +637,20 @@ function App(props) {
                 ) : null}
                 <p>
                   <Button
+                   compact 
                     disabled={!fileStatus}
                     onClick={onSubmit}
                     className="InputFileButton"
                   >
-                    Submit
+                  <Icon name='upload' />
+                  Submit
                   </Button>{" "}
                   <Button
+                   compact
                     onClick={toggleUploadStatus}
                     className="InputFileButton"
                   >
+                  <Icon name='undo alternate' />
                     Go back
                   </Button>
                 </p>
@@ -619,6 +663,7 @@ function App(props) {
                 
                 <Header as='h2' inverted color = 'grey' floated = 'left'>T2 - Transcribe & Translate</Header>
                 
+    
                 <Button circular floated = 'right' compact
                       onClick={() =>
                         updateKeyphraseSearchStatus(!showKeyphraseSearchStatus)
@@ -647,39 +692,39 @@ function App(props) {
                     </Table.Header>
 
                     <Table.Body>{showTable()}</Table.Body>
-                    <Table.Footer>
-                      <Table.Row>
-                        <Table.HeaderCell colSpan="1">
-                          <Menu floated="right" pagination>
-                            <Menu.Item as="a" icon>
-                              Page(s)
-                            </Menu.Item>
-                            {showPanigation()}
-          
-                          </Menu>
-                        </Table.HeaderCell>
-                      </Table.Row>
-                    </Table.Footer>
+
                   </Table>
+                  
+                  <Menu floated="left" pagination>
+                  <Menu.Item as="a" icon >
+                    Page(s)
+                  </Menu.Item>
+                  {showPanigation()}
+
+                </Menu>
+                
+                
+ 
                   <p className="MenuBar">
+                    
+                    
+                    <Button onClick={onSignOut} className="InputFileButton" compact floated = 'right'>
+                    <Icon name='sign-out' />  
+                    Sign Out
+                    </Button>{" "}
                     <Button
                       className="InputFileButton"
                       onClick={toggleUploadStatus}
-                      compact circular
+                      compact
+                      floated = 'right'
                     >
-                      
-                         
                       <Icon name='cloud upload' />
                       Upload File  
                       
                     </Button>{" "}
-                    <Button className="InputFileButton" onClick={refreshPage} compact circular>
+                    <Button className="InputFileButton" onClick={refreshPage} compact floated = 'right'>
                     <Icon name='refresh' />
                     Refresh Table
-                    </Button>{" "}
-                    <Button onClick={onSignOut} className="InputFileButton" compact circular floated = 'right'>
-                    <Icon name='sign-out' />  
-                    Sign Out
                     </Button>{" "}
                     
                   </p>
@@ -697,6 +742,7 @@ function App(props) {
                         </Button></Header>
                       
                         </p>
+
                         
                         <Form>
                           <TextArea
@@ -733,15 +779,16 @@ function App(props) {
                         <p className="MenuBar"> 
                           <Dropdown
                             options={targetOptions}
-                            onChange={_searchTargetLanguageChosen}
+                            onChange={_searchtarget_languageChosen}
                             placeholder="Choose from dropdown"
-                            search
+                            search 
                           />
                           <p>
                           </p>
                           
                           
                           <TextArea
+                            rows={1}
                             placeholder="Enter keyphrase"
                             onChange={handleKeyphraseChange}
                           />
