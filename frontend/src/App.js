@@ -10,9 +10,9 @@ import {
   Table,
   Modal,
   Form,
-  Pagination ,
   TextArea,
   Segment,
+  Input
 } from "semantic-ui-react";
 import Login from "./Components/Authentication/Login";
 import { Hub } from "aws-amplify";
@@ -23,6 +23,7 @@ import "react-dropdown/style.css";
 import axios from "axios";
 import { useAlert } from "react-alert";
 import Dropdown from "react-dropdown";
+//import mainTable from "./Components/mainTable"
 
 function App(props) {
   // From AWS
@@ -46,11 +47,13 @@ function App(props) {
   const updateTranslationApi =
     "https://ti7db5ed14.execute-api.us-east-1.amazonaws.com/Stage_1";
 
+  let updatePayload = {
+    input: "{}",
+    stateMachineArn:
+      "arn:aws:states:us-east-1:313039493322:stateMachine:LaPresse-UpdatedTranslations",
+  };
 
-  let updatePayload ={"input":"{}",
-  "stateMachineArn":"arn:aws:states:us-east-1:313039493322:stateMachine:LaPresse-UpdatedTranslations"}
-
-  let totalPage = 1
+  let totalPage = 1;
 
   // Initialisations
 
@@ -59,11 +62,12 @@ function App(props) {
     file_name: "",
     target_language: "",
     username: "",
+    description: ""
   };
 
   const [searchPayload, updateSearchPayload] = useState({
-    target_language: ''
-  })
+    target_language: "",
+  });
 
   const statusPayload = { username: "" };
   const targetOptions = [
@@ -150,6 +154,8 @@ function App(props) {
   const [currentPage, updateCurrentPage] = useState(1);
   const [totalPages, updateTotalPages] = useState(1);
 
+  const [submitStatus, updateSubmitStatus] = useState('Submit')
+
   const [showKeyphraseSearchStatus, updateKeyphraseSearchStatus] =
     useState(false);
   const [keyphrase, updateKeyphrase] = useState(" ");
@@ -162,8 +168,13 @@ function App(props) {
     currentfile_name: "",
   });
 
-  const [translationData, updateTranslationData] = useState('Loading...');
+
+  const [userInputtedFileName, updateUserInputtedFileName] = useState('')
+
+  const [translationData, updateTranslationData] = useState("Loading...");
   const [translationKey, updateTranslationKey] = useState(" ");
+  
+
   const [fileStatus, updateFileStatus] = useState(true);
 
   const showEditor = translationEditorStatus.showEditor;
@@ -185,6 +196,7 @@ function App(props) {
   }, []);
 
   function onFileChange(e) {
+
     file = e.target.files[0];
     let file_name = file.name;
     let fileExt = file_name.substring(
@@ -192,9 +204,9 @@ function App(props) {
       file_name.length
     );
     if (allowedExts.indexOf(fileExt) !== -1) {
-      updateFileStatus(true);
+      updateFileStatus(true)
     } else {
-      updateFileStatus(false);
+      updateFileStatus(false)
     }
   }
 
@@ -215,8 +227,9 @@ function App(props) {
     });
   }
 
-  function _source_languageChosen(option) {
+  function sourceLanguageChosen(option) {
     payload["source_language"] = option.value;
+    console.log(option.value)
     //console.log("Source Language ", option.value);
   }
 
@@ -246,6 +259,8 @@ function App(props) {
             translation_key: " ",
             source_language: payload["source_language"],
             target_language: payload["target_language"],
+            description: payload['description'],
+            keywords :[]
           });
           updateJobState({
             jobs: newJob,
@@ -258,33 +273,45 @@ function App(props) {
     });
   }
 
-  function _target_languageChosen(option) {
+  function targetLanguageChosen(option) {
     payload["target_language"] = option.value;
-    //console.log("Target Language ", option.value);
+
   }
 
-  function _searchtarget_languageChosen(option) {
+  function searchTargetLanguageChosen(option) {
     updateSearchPayload((prevState) => {
       return { ...prevState, target_language: option.value };
-    })
-    
+    });
+
     console.log("Target Language ", searchPayload);
   }
 
   async function onSubmit() {
+    console.log(payload)
     try {
       await Storage.put(file.name, file, {
         progressCallback(progress) {
-          //console.log(`Uploaded: (${progress.loaded}/${progress.total})`);
+          console.log(`Uploaded: (${progress.loaded}/${progress.total})`);
         },
       });
       payload.file_name = file.name;
       //console.log("Calling api...");
       callApi();
     } catch (err) {
-      //console.log("Error uploading file: ", err);
+      console.log("Error uploading file: ", err);
     }
   }
+
+  const handleTranslationChange = (event) => {
+    updateTranslationData(event.target.value);
+  };
+
+  const handleFileNameChange = (event) => {
+
+    console.log(payload['translate_target'])
+
+    payload['description']=event.target.value;
+  };
 
   const alert = useAlert();
 
@@ -292,7 +319,6 @@ function App(props) {
     console.log("keyphrase");
     console.log(keyphrase);
     Auth.currentSession().then((data) => {
-
       const finalSearchPayload = {
         username: data["accessToken"]["payload"]["username"],
         translateTarget: searchPayload["target_language"],
@@ -333,38 +359,31 @@ function App(props) {
   }
 
   function fetchData() {
-    
     Auth.currentSession().then((data) => {
       statusPayload["username"] = data["accessToken"]["payload"]["username"];
       //console.log(statusPayload["username"]);
       axios
         .post(scanApi, statusPayload)
         .then((response) => {
-          console.log(response)
+          console.log(response);
           let newJob = JSON.parse(response["data"]["body"]);
-          console.log(newJob)
+          console.log(newJob);
           newJob = newJob["Items"];
           //console.log(newJob);
           updateJobState({
             jobs: newJob,
           });
-          
         })
         .catch((error) => {
           console.log(error);
         });
     });
-    console.log(jobState)
-    console.log(jobState['jobs'].length)
-
-
-    
-
-    
+    console.log(jobState);
+    console.log(jobState["jobs"].length);
   }
 
   async function downloadData(key) {
-    console.log(key)
+    console.log(key);
     const signedURL = await Storage.get(key);
     let a = document.createElement("a");
     a.href = signedURL;
@@ -373,28 +392,25 @@ function App(props) {
     a.click();
   }
 
-  function beforeEditTranslation(job, translation_key){
-
-    console.log(job)
-    job.s3url = translation_key
+  function beforeEditTranslation(job, translation_key) {
+    console.log(job);
+    job.s3url = translation_key;
 
     updateJob((prevState) => {
-      console.log("in job update")
-      return {job};
-    })
+      console.log("in job update");
+      return { job };
+    });
 
-    console.log(currentJob)
+    console.log(currentJob);
 
-    editTranslation(translation_key)
-
-}
+    editTranslation(translation_key);
+  }
 
   async function editTranslation(key) {
-    console.log('key')
-    console.log(key)
+    console.log("key");
+    console.log(key);
     portalStatus(true); //Open editor
     updateTranslationKey(key);
-
 
     const signedURL = await Storage.get(key, {
       download: true,
@@ -408,9 +424,7 @@ function App(props) {
 
   async function handleTranslationUpload() {
     const key = translationKey;
-    console.log(currentJob)
-
-
+    console.log(currentJob);
 
     const result = await Storage.put(key, translationData, {
       progressCallback(progress) {
@@ -420,12 +434,16 @@ function App(props) {
     editTranslation(key);
     portalStatus(false);
 
-    let translationMetadata = {username:currentJob.job.username, target_language: currentJob.job.target_language, file_name:currentJob.job.file_name, s3url:'public/'+currentJob.job.s3url}
+    let translationMetadata = {
+      username: currentJob.job.username,
+      target_language: currentJob.job.target_language,
+      file_name: currentJob.job.file_name,
+      s3url: "public/" + currentJob.job.s3url,
+    };
 
-    console.log(translationMetadata)
-    updatePayload.input = JSON.stringify(translationMetadata)
-    console.log(typeof(updatePayload.input))
-    
+    console.log(translationMetadata);
+    updatePayload.input = JSON.stringify(translationMetadata);
+    console.log(typeof updatePayload.input);
 
     axios
       .post(updateTranslationApi, updatePayload)
@@ -434,7 +452,7 @@ function App(props) {
         console.log(response);
       })
       .catch((error) => {
-        console.log('error from update')
+        console.log("error from update");
         console.log(error);
       });
 
@@ -466,59 +484,44 @@ function App(props) {
     return returnString;
   }
 
-  const handleTranslationChange = (event) => {
-    updateTranslationData(event.target.value);
-  };
-
   const handleKeyphraseChange = (event) => {
     updateKeyphrase(event.target.value);
   };
 
-
-
-
   function showTable() {
-    console.log(jobState)
+    console.log(jobState);
 
-    let totalNumberOfFiles = jobState['jobs'].length
-    console.log(jobState['jobs'].length)
+    let totalNumberOfFiles = jobState["jobs"].length;
+    console.log(jobState["jobs"].length);
 
-    
-      if (totalNumberOfFiles !== 0){
-        totalPage=Math.ceil(jobState['jobs'].length / maxPerPage)
-        
-      }
-      else{
-        totalPage = 1
-      }
-    
-
-  
+    if (totalNumberOfFiles !== 0) {
+      totalPage = Math.ceil(jobState["jobs"].length / maxPerPage);
+    } else {
+      totalPage = 1;
+    }
 
     const newRows = jobState.jobs.filter((job, index) => ((((showAllStatus === true) && (((index/maxPerPage) < currentPage) && ((index/maxPerPage) >= (currentPage -1)))) ) || (searchedFiles.includes(job["file_name"])) )).map((job) => {
-        console.log(job.transcription_key)
-        let transcription_tokens = ''
-        let translate_tokens = ''
-        let transcribeKey = ''
-        let translateKey = ''
+        //console.log(job.transcription_key);
+        let transcription_tokens = "";
+        let translate_tokens = "";
+        let transcribeKey = "";
+        let translateKey = "";
 
-
-        if (job.transcription_key != null){
+        if (job.transcription_key != null) {
           transcription_tokens = job.transcription_key.split("/").slice(4);
           transcribeKey = transcription_tokens.join("/");
         }
 
-        
-        
-        
-        if (job.translation_key != null){  
-         translate_tokens = job.translation_key.split("/").slice(1);
-         translateKey = translate_tokens.join("/");
+        if (job.translation_key != null) {
+          translate_tokens = job.translation_key.split("/").slice(1);
+          translateKey = translate_tokens.join("/");
         }
-        
-        
 
-        if (job.translation_key === "In progress" || job.translation_key === null ) {
+        if (
+          job.translation_key === "In progress" ||
+          job.translation_key === null ||
+          job.translation_key === ''
+        ) {
           // In progress
           translateStatus = <Icon loading name="spinner" />;
         } else if (job.translation_key === "Invalid") {
@@ -528,16 +531,24 @@ function App(props) {
           //Not started
           translateStatus = <Icon name="pause circle" />;
         } else {
-          
           translateStatus = (
             <div>
-            <Button.Group fluid compact>
-              <Button onClick={() => downloadData(translateKey)}>
-                {" "}
-                <Icon name="download" />{" "}
-              </Button>
+              <Button.Group fluid compact>
+                <Button onClick={() => downloadData(translateKey)}>
+                  {" "}
+                  <Icon name="download" />{" "}
+                </Button>
 
-              <Button onClick={() => {console.log(job); console.log(currentJob); beforeEditTranslation(job, translateKey)}} > <Icon name="edit" /></Button>
+                <Button
+                  onClick={() => {
+                    console.log(job);
+                    console.log(currentJob);
+                    beforeEditTranslation(job, translateKey);
+                  }}
+                >
+                  {" "}
+                  <Icon name="edit" />
+                </Button>
               </Button.Group>
             </div>
           );
@@ -545,14 +556,18 @@ function App(props) {
 
         return (
           <Table.Row>
-            <Table.Cell> {job['file_name']} </Table.Cell>
-            <Table.Cell textAlign='center'>{job.source_language}</Table.Cell>
-            <Table.Cell textAlign='center'>{job.target_language}</Table.Cell>
-            <Table.Cell textAlign='center'> {job.status} </Table.Cell>
+            <Table.Cell> {job["description"]} </Table.Cell>
+            <Table.Cell textAlign="center">{job.source_language}</Table.Cell>
+            <Table.Cell textAlign="center">{job.target_language}</Table.Cell>
+            <Table.Cell textAlign="center"> {job.status} </Table.Cell>
             <Table.Cell>
               {" "}
-              {transcribeKey !== '' ? (
-                <Button onClick={() => downloadData(transcribeKey)} compact fluid>
+              {transcribeKey !== "" ? (
+                <Button
+                  onClick={() => downloadData(transcribeKey)}
+                  compact
+                  fluid
+                >
                   {" "}
                   <Icon name="download" />
                 </Button>
@@ -589,6 +604,9 @@ function App(props) {
               darkMode={true}
             />
           )}
+
+          
+
           {currentLoginState === "signedIn" &&
             (showUploadFormStatus.showUploadForm ? (
               <div className="UploadForm">
@@ -598,7 +616,7 @@ function App(props) {
                   </Header>
                   <Dropdown
                     options={sourceOptions}
-                    onChange={_source_languageChosen}
+                    onChange={sourceLanguageChosen}
                     placeholder="Choose from dropdown"
                   />
                 </p>
@@ -609,10 +627,17 @@ function App(props) {
 
                   <Dropdown
                     options={targetOptions}
-                    onChange={_target_languageChosen}
+                    onChange={targetLanguageChosen}
                     placeholder="Choose from dropdown"
-                    search inverted
+                    search
+                    inverted
                   />
+                </p>
+                <p>
+                <Header as="h4" inverted color="grey">
+                File Name:
+                </Header>
+                <Input placeholder='Search...' onChange={handleFileNameChange}/>
                 </p>
                 <p>
                   <input
@@ -621,6 +646,11 @@ function App(props) {
                     className="InputFileButton"
                   />
                 </p>
+
+               
+
+
+
                 {status.showStatus ? (
                   <p>
                     <Button onClick={showAlert} className="InputFileButton">
@@ -637,52 +667,56 @@ function App(props) {
                 ) : null}
                 <p>
                   <Button
-                   compact 
+                    compact
                     disabled={!fileStatus}
-                    onClick={onSubmit}
+                    onClick={() => {updateSubmitStatus('Submitted'); console.log(payload); onSubmit()}}
                     className="InputFileButton"
                   >
-                  <Icon name='upload' />
-                  Submit
+                    <Icon name="upload" />
+                    {submitStatus}
                   </Button>{" "}
                   <Button
-                   compact
+                    compact
                     onClick={toggleUploadStatus}
                     className="InputFileButton"
                   >
-                  <Icon name='undo alternate' />
+                    <Icon name="undo alternate" />
                     Go back
                   </Button>
                 </p>
               </div>
             ) : (
-              <div>
+
               
+
+              <div>
                 <div className="TableView">
-                <p className="MenuBar">
-                
-                <Header as='h2' inverted color = 'grey' floated = 'left'>T2 - Transcribe & Translate</Header>
-                
-    
-                <Button circular floated = 'right' compact
+                  <p className="MenuBar">
+                    <Header as="h2" inverted color="grey" floated="left">
+                      T2 - Transcribe & Translate
+                    </Header>
+                    <Button
+                      circular
+                      floated="right"
+                      compact
                       onClick={() =>
                         updateKeyphraseSearchStatus(!showKeyphraseSearchStatus)
                       }
                       className="InputFileButton"
                     >
-                    <Icon name='search' />
+                      <Icon name="search" />
                       Search by keyphrase
                     </Button>
                     ' '
-                    </p>
+                  </p>
                   <Table
                     celled
                     class="ui inverted black table"
                     className="Table"
                   >
                     <Table.Header>
-                      <Table.Row textAlign='center'>
-                        <Table.HeaderCell>File Name</Table.HeaderCell>
+                      <Table.Row textAlign="center">
+                        <Table.HeaderCell>Description</Table.HeaderCell>
                         <Table.HeaderCell>Source Language</Table.HeaderCell>
                         <Table.HeaderCell>Target Language</Table.HeaderCell>
                         <Table.HeaderCell>Status</Table.HeaderCell>
@@ -692,70 +726,83 @@ function App(props) {
                     </Table.Header>
 
                     <Table.Body>{showTable()}</Table.Body>
-
                   </Table>
-                  
-                  <Menu floated="left" pagination>
-                  <Menu.Item as="a" icon >
-                    Page(s)
-                  </Menu.Item>
-                  {showPanigation()}
 
-                </Menu>
-                
-                
- 
+                  <Menu floated="left" pagination>
+                    <Menu.Item as="a" icon>
+                      Page(s)
+                    </Menu.Item>
+                    {showPanigation()}
+                  </Menu>
+
                   <p className="MenuBar">
-                    
-                    
-                    <Button onClick={onSignOut} className="InputFileButton" compact floated = 'right'>
-                    <Icon name='sign-out' />  
-                    Sign Out
+                    <Button
+                      onClick={onSignOut}
+                      className="InputFileButton"
+                      compact
+                      floated="right"
+                    >
+                      <Icon name="sign-out" />
+                      Sign Out
                     </Button>{" "}
                     <Button
                       className="InputFileButton"
                       onClick={toggleUploadStatus}
                       compact
-                      floated = 'right'
+                      floated="right"
                     >
-                      <Icon name='cloud upload' />
-                      Upload File  
-                      
+                      <Icon name="cloud upload" />
+                      Upload File
                     </Button>{" "}
-                    <Button className="InputFileButton" onClick={refreshPage} compact floated = 'right'>
-                    <Icon name='refresh' />
-                    Refresh Table
+                    <Button
+                      className="InputFileButton"
+                      onClick={refreshPage}
+                      compact
+                      floated="right"
+                    >
+                      <Icon name="refresh" />
+                      Refresh Table
                     </Button>{" "}
-                    
                   </p>
+
+
+                  
+
+
                   <div>
                     <Modal open={showEditor}>
                       <Segment>
-                      <p className="MenuBar">
-                      <Header as='h3'>Translation Editor
-                      <Button
-                          onClick={() => {portalStatus(false); updateTranslationData('Loading...')}}
-                          floated={"right"}
-                          circular compact
-                        >
-                          <Icon name="close" />
-                        </Button></Header>
-                      
+                        <p className="MenuBar">
+                          <Header as="h3">
+                            Translation Editor
+                            <Button
+                              onClick={() => {
+                                portalStatus(false);
+                                updateTranslationData("Loading...");
+                              }}
+                              floated={"right"}
+                              circular
+                              compact
+                            >
+                              <Icon name="close" />
+                            </Button>
+                          </Header>
                         </p>
 
-                        
                         <Form>
                           <TextArea
                             value={translationData}
                             onChange={handleTranslationChange}
                           />
                           <p className="MenuBar">
-                          <Button onClick={handleTranslationUpload} compact circular>
-                            Upload translation
-                          </Button>
-                          
+                            <Button
+                              onClick={handleTranslationUpload}
+                              compact
+                              circular
+                            >
+                              Upload translation
+                            </Button>
                           </p>
-                          
                         </Form>
                       </Segment>
                     </Modal>
@@ -763,42 +810,43 @@ function App(props) {
                   <div>
                     <Modal open={showKeyphraseSearchStatus}>
                       <Segment>
-                      <p className="MenuBar"> 
-                      <Header as='h3'>Keyword Search
-                      <Button
-                          onClick={() => updateKeyphraseSearchStatus(false)}
-                          floated={"right"}
-                          circular compact
-                        >
-                          <Icon name="close" />
-                        </Button></Header>
-                        Note: Please enter keyphrases without apostrophes (')
-                      </p>
+                        <p className="MenuBar">
+                          <Header as="h3">
+                            Keyword Search
+                            <Button
+                              onClick={() => updateKeyphraseSearchStatus(false)}
+                              floated={"right"}
+                              circular
+                              compact
+                            >
+                              <Icon name="close" />
+                            </Button>
+                          </Header>
+                          Note: Please enter keyphrases without apostrophes (')
+                        </p>
 
                         <Form>
-                        <p className="MenuBar"> 
-                          <Dropdown
-                            options={targetOptions}
-                            onChange={_searchtarget_languageChosen}
-                            placeholder="Choose from dropdown"
-                            search 
-                          />
-                          <p>
+                          <p className="MenuBar">
+                            <Dropdown
+                              options={targetOptions}
+                              onChange={searchTargetLanguageChosen}
+                              placeholder="Choose from dropdown"
+                              search
+                            />
+                            <p></p>
+
+                            <TextArea
+                              rows={1}
+                              placeholder="Enter keyphrase"
+                              onChange={handleKeyphraseChange}
+                            />
+                            <p></p>
+
+                            <Button onClick={searchKeyphrases} compact circular>
+                              <Icon name="search" />
+                              Search
+                            </Button>
                           </p>
-                          
-                          
-                          <TextArea
-                            rows={1}
-                            placeholder="Enter keyphrase"
-                            onChange={handleKeyphraseChange}
-                          />
-                          <p>
-                          </p>
-                          
-                          
-                          <Button onClick={searchKeyphrases} compact circular><Icon name='search' />Search</Button>
-                          </p>
-                          
                         </Form>
                       </Segment>
                     </Modal>
