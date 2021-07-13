@@ -12,7 +12,9 @@ import {
   Form,
   TextArea,
   Segment,
-  Input
+  Input,
+  List,
+  Label
 } from "semantic-ui-react";
 import Login from "./Components/Authentication/Login";
 import { Hub } from "aws-amplify";
@@ -148,11 +150,11 @@ function App(props) {
   });
 
   const [searchedFiles, updateSearchedFiles] = useState([]);
+  const [searchedFilesLanguage, updateSearchedFilesLanguage] = useState('')
   const [showAllStatus, updateShowAllStatus] = useState(true);
 
   const [maxPerPage, updateMaxPerPage] = useState(5);
   const [currentPage, updateCurrentPage] = useState(1);
-  const [totalPages, updateTotalPages] = useState(1);
 
   const [submitStatus, updateSubmitStatus] = useState('Submit')
 
@@ -169,8 +171,6 @@ function App(props) {
   });
 
 
-  const [userInputtedFileName, updateUserInputtedFileName] = useState('')
-
   const [translationData, updateTranslationData] = useState("Loading...");
   const [translationKey, updateTranslationKey] = useState(" ");
   
@@ -178,6 +178,11 @@ function App(props) {
   const [fileStatus, updateFileStatus] = useState(true);
 
   const showEditor = translationEditorStatus.showEditor;
+  const [showExtraInfo, toggleShowExtraInfo] = useState({
+    toggle:false, 
+    file_name:'',
+    keyphrases:[]
+  })
 
   const [jobState, updateJobState] = useState({
     jobs: [],
@@ -233,21 +238,19 @@ function App(props) {
     //console.log("Source Language ", option.value);
   }
 
+
   function callApi() {
-    //console.log("payload");
+    console.log("calling API");
     //console.log(payload);
     Auth.currentSession().then((data) => {
       payload["username"] = data["accessToken"]["payload"]["username"];
       axios
         .post(api, payload)
         .then((response) => {
-          job_name = response["data"]["body"];
-          //.log("response");
-          //console.log(response);
-          statusPayload["job_name"] = job_name.substring(
-            1,
-            job_name.length - 1
-          );
+          job_name = response["data"];
+          console.log("response");
+          console.log(response);
+          statusPayload["job_name"] = job_name
           //console.log(statusPayload["job_name"]);
           let newJob = jobState.jobs.slice();
           newJob.push({
@@ -268,7 +271,8 @@ function App(props) {
           toggleUploadStatus();
         })
         .catch((error) => {
-          //console.log(error);
+          console.log("## ERROR ##")
+          console.log(error);
         });
     });
   }
@@ -327,9 +331,11 @@ function App(props) {
       axios
         .post(searchApi, finalSearchPayload)
         .then((response) => {
-          updateSearchedFiles(response["data"]);
+          updateSearchedFiles(response["data"]["searchedFiles"]);
           updateShowAllStatus(false);
-
+          updateSearchedFilesLanguage(response["data"]["language"])
+          console.log("response")
+          console.log(response)
           console.log(searchedFiles);
         })
         .catch((error) => {
@@ -357,6 +363,8 @@ function App(props) {
       showUploadForm: !showUploadFormStatus.showUploadForm,
     });
   }
+
+
 
   function fetchData() {
     Auth.currentSession().then((data) => {
@@ -500,12 +508,17 @@ function App(props) {
       totalPage = 1;
     }
 
-    const newRows = jobState.jobs.filter((job, index) => ((((showAllStatus === true) && (((index/maxPerPage) < currentPage) && ((index/maxPerPage) >= (currentPage -1)))) ) || (searchedFiles.includes(job["file_name"])) )).map((job) => {
-        //console.log(job.transcription_key);
+    console.log('searched')
+    console.log(showAllStatus)
+    console.log(searchedFilesLanguage)
+
+    const newRows = jobState.jobs.slice(0).reverse().filter((job, index) => ((((showAllStatus === true) && (((index/maxPerPage) < currentPage) && ((index/maxPerPage) >= (currentPage -1)))) ) || ((searchedFiles.includes(job["file_name"])) && job['target_language'] === searchedFilesLanguage))).map((job) => {
+        console.log(job.translationKey);
         let transcription_tokens = "";
         let translate_tokens = "";
         let transcribeKey = "";
         let translateKey = "";
+        let currentKeyphrases = (job.keyphrases === null?['COMPREHEND IS NOT COMPLETE']:job.keyphrases)
 
         if (job.transcription_key != null) {
           transcription_tokens = job.transcription_key.split("/").slice(4);
@@ -518,9 +531,9 @@ function App(props) {
         }
 
         if (
-          job.translation_key === "In progress" ||
-          job.translation_key === null ||
-          job.translation_key === ''
+          (job.translation_key === "In progress") ||
+          (typeof(job.translation_key) === 'undefined') ||
+          (job.translation_key === null)
         ) {
           // In progress
           translateStatus = <Icon loading name="spinner" />;
@@ -576,6 +589,14 @@ function App(props) {
               )}
             </Table.Cell>
             <Table.Cell> {translateStatus}</Table.Cell>
+            <Table.Cell> <Button
+            onClick={() =>toggleShowExtraInfo(() => {return {toggle: true, file_name : job.file_name, keyphrases: currentKeyphrases };})}
+            compact
+            fluid
+          >
+            {" "}
+            <Icon name="plus" />
+          </Button></Table.Cell>
           </Table.Row>
         );
       });
@@ -669,7 +690,7 @@ function App(props) {
                   <Button
                     compact
                     disabled={!fileStatus}
-                    onClick={() => {updateSubmitStatus('Submitted'); console.log(payload); onSubmit()}}
+                    onClick={() => {updateSubmitStatus('Submitted'); console.log("payload"); onSubmit()}}
                     className="InputFileButton"
                   >
                     <Icon name="upload" />
@@ -722,6 +743,7 @@ function App(props) {
                         <Table.HeaderCell>Status</Table.HeaderCell>
                         <Table.HeaderCell>Transcription</Table.HeaderCell>
                         <Table.HeaderCell>Translation</Table.HeaderCell>
+                        <Table.HeaderCell>More</Table.HeaderCell>
                       </Table.Row>
                     </Table.Header>
 
@@ -850,6 +872,45 @@ function App(props) {
                         </Form>
                       </Segment>
                     </Modal>
+                  </div>
+                  <div>
+                  
+                  <Modal open={showExtraInfo.toggle}>
+                  <Segment>
+                  <p className="MenuBar">
+                    <Header as="h3">
+                      Details
+                      <Button
+                        onClick={() =>     toggleShowExtraInfo(() => {
+                          return {toggle:false, file_name:'', keyphrases:[] };
+                        })}
+                        floated={"right"}
+                        circular
+                        compact
+                      >
+                        <Icon name="close" />
+                      </Button>
+                    </Header>
+                  </p>
+                </Segment>
+
+                <Segment>
+                <Header as='h5'> File Name: </Header>
+                 {showExtraInfo.file_name}
+                </Segment>
+                <Segment>
+                <Header as='h5'> Keyphrases: </Header>
+                
+                {showExtraInfo.keyphrases.map((keyphrase) => (
+                  <Label>{keyphrase}</Label>
+                  ))
+              }
+                
+                
+                </Segment>
+                
+
+                  </Modal>
                   </div>
                 </div>
               </div>
