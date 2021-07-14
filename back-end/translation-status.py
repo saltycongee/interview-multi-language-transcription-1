@@ -18,6 +18,8 @@ def msgpublish(jobid):
         logger.error("An error occured: %s" % e)
     
 def lambda_handler(event, context):
+    print(event)
     logger.setLevel(logging.DEBUG)
     logger.debug('Job ID is: {}' .format(event))
+    print(len(event))
     return(msgpublish(event))

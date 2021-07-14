@@ -1,0 +1,41 @@
+{
+    "Comment": "Polling step function for translate job complete",
+    "StartAt": "Comprehend Keyphrases",
+    "States": {
+      "Comprehend Keyphrases": {
+        "Type": "Task",
+        "Resource": "arn:aws:lambda:us-east-1:313039493322:function:la-presse-comprehend-function",
+        "InputPath": "$.s3url",
+        "ResultPath": "$.keyphrases",
+        "Next": "Add to SQL Database",
+        "Retry": [
+          {
+            "ErrorEquals": [
+              "States.ALL"
+            ],
+            "IntervalSeconds": 1,
+            "MaxAttempts": 3,
+            "BackoffRate": 2
+          }
+        ]
+        
+      },
+      "Add to SQL Database": {
+        "Type": "Task",
+        "Resource": "arn:aws:lambda:us-east-1:313039493322:function:la-presse-update-database",
+        "InputPath": "$",
+        "ResultPath": "$.result",
+        "Retry": [
+          {
+            "ErrorEquals": [
+              "States.ALL"
+            ],
+            "IntervalSeconds": 1,
+            "MaxAttempts": 3,
+            "BackoffRate": 2
+          }
+        ], 
+         "End": true
+      }
+    }
+  }

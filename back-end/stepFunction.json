@@ -1,0 +1,180 @@
+{
+  "Comment": "Polling step function for translate job complete",
+  "StartAt": "Transcription Status",
+  "States": {
+    "Transcription Status": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:313039493322:function:la-presse-transcription-status",
+      "InputPath": "$.job_name",
+      "ResultPath": "$.transcription_status",
+      "Next": "Transcription Job Complete?",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ]
+    },
+    "Transcription Job Complete?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.transcription_status.transcription_status",
+          "StringEquals": "IN_PROGRESS",
+          "Next": "Wait X Seconds 1"
+        },
+        {
+          "Variable": "$.transcription_status.transcription_status",
+          "StringEquals": "SUBMITTED",
+          "Next": "Wait X Seconds 1"
+        },
+        {
+          "Variable": "$.transcription_status.transcription_status",
+          "StringEquals": "COMPLETED",
+          "Next": "Post Transcription"
+        },
+        {
+          "Variable": "$.transcription_status.transcription_status",
+          "StringEquals": "FAILED",
+          "Next": "Post Transcription"
+        },
+        {
+          "Variable": "$.transcription_status.transcription_status",
+          "StringEquals": "STOPPED",
+          "Next": "Post Transcription"
+        }
+      ],
+      "Default": "Wait X Seconds 1"
+    },
+    "Wait X Seconds 1": {
+      "Type": "Wait",
+      "Seconds": 60,
+      "Next": "Transcription Status"
+    },
+    "Post Transcription": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:313039493322:function:la-presse-transcribe-function-postgres",
+      "InputPath": "$",
+      "ResultPath": "$.translation_JobId",
+      "Next": "LambdaPoll",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ]
+    },
+    "LambdaPoll": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:313039493322:function:la-presse-translation-status",
+      "InputPath": "$.translation_JobId",
+      "ResultPath": "$.translation_status",
+      "Next": "Job Complete?",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ]
+    },
+    "Job Complete?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.translation_status",
+          "StringEquals": "IN_PROGRESS",
+          "Next": "Wait X Seconds"
+        },
+        {
+          "Variable": "$.translation_status",
+          "StringEquals": "SUBMITTED",
+          "Next": "Wait X Seconds"
+        },
+        {
+          "Variable": "$.translation_status",
+          "StringEquals": "COMPLETED",
+          "Next": "Update Database"
+        },
+        {
+          "Variable": "$.translation_status",
+          "StringEquals": "FAILED",
+          "Next": "Update Database"
+        },
+        {
+          "Variable": "$.translation_status",
+          "StringEquals": "STOPPED",
+          "Next": "Update Database"
+        }
+      ],
+      "Default": "Wait X Seconds"
+    },
+    "Wait X Seconds": {
+      "Type": "Wait",
+      "Seconds": 60,
+      "Next": "LambdaPoll"
+    },
+    "Update Database": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:313039493322:function:la-presse-result-function-postgres",
+      "InputPath": "$",
+      "ResultPath": "$.s3url",
+      "Next": "Comprehend Keyphrases",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ]
+    },
+    "Comprehend Keyphrases": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:313039493322:function:la-presse-comprehend-function",
+      "InputPath": "$.s3url",
+      "ResultPath": "$.keyphrases",
+      "Next": "Add to SQL Database",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ]
+    },
+    "Add to SQL Database": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:313039493322:function:la-presse-update-database",
+      "InputPath": "$",
+      "ResultPath": "$.result",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "End": true
+    }
+  }
+}
