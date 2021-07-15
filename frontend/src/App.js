@@ -268,7 +268,7 @@ function App(props) {
             job_name: job_name.substring(1, job_name.length - 1),
             status: "In progress",
             transcription_key: " ",
-            translation_key: " ",
+            translation_key: "Not started",
             source_language: payload["source_language"],
             target_language: payload["target_language"],
             description: payload["description"],
