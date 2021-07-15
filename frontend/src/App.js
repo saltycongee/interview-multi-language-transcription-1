@@ -13,8 +13,8 @@ import {
   TextArea,
   Segment,
   Input,
-  List,
-  Label
+  Label,
+  Progress
 } from "semantic-ui-react";
 import Login from "./Components/Authentication/Login";
 import { Hub } from "aws-amplify";
@@ -145,6 +145,9 @@ function App(props) {
     showStatus: false,
   });
 
+  const [fileUploadProgress, updateFileUploadProgress] = useState(0)
+  const [fileUploadProgressModal, toggleFileUploadProgressModal] = useState(false)
+
   const [showUploadFormStatus, updateUploadFormStatus] = useState({
     showUploadForm: false,
   });
@@ -153,7 +156,7 @@ function App(props) {
   const [searchedFilesLanguage, updateSearchedFilesLanguage] = useState('')
   const [showAllStatus, updateShowAllStatus] = useState(true);
 
-  const [maxPerPage, updateMaxPerPage] = useState(5);
+  const [maxPerPage, updateMaxPerPage] = useState(8);
   const [currentPage, updateCurrentPage] = useState(1);
 
   const [submitStatus, updateSubmitStatus] = useState('Submit')
@@ -290,12 +293,15 @@ function App(props) {
     console.log("Target Language ", searchPayload);
   }
 
+
   async function onSubmit() {
     console.log(payload)
     try {
       await Storage.put(file.name, file, {
         progressCallback(progress) {
           console.log(`Uploaded: (${progress.loaded}/${progress.total})`);
+          updateFileUploadProgress((progress.loaded/progress.total)*100)
+          console.log(fileUploadProgress)
         },
       });
       payload.file_name = file.name;
@@ -304,6 +310,8 @@ function App(props) {
     } catch (err) {
       console.log("Error uploading file: ", err);
     }
+    updateFileUploadProgress(0)
+    toggleFileUploadProgressModal(false)
   }
 
   const handleTranslationChange = (event) => {
@@ -569,7 +577,8 @@ function App(props) {
 
         return (
           <Table.Row>
-            <Table.Cell> {job["description"]} </Table.Cell>
+          <Table.Cell> {job.file_name} </Table.Cell>
+            <Table.Cell> {job.description} </Table.Cell>
             <Table.Cell textAlign="center">{job.source_language}</Table.Cell>
             <Table.Cell textAlign="center">{job.target_language}</Table.Cell>
             <Table.Cell textAlign="center"> {job.status} </Table.Cell>
@@ -656,11 +665,14 @@ function App(props) {
                 </p>
                 <p>
                 <Header as="h4" inverted color="grey">
-                File Name:
+                Description:
                 </Header>
-                <Input placeholder='Search...' onChange={handleFileNameChange}/>
+                <Input fluid onChange={handleFileNameChange}/>
                 </p>
                 <p>
+                <Header as="h4" inverted color="grey">
+                Select file:
+                </Header>
                   <input
                     type="file"
                     onChange={onFileChange}
@@ -690,7 +702,7 @@ function App(props) {
                   <Button
                     compact
                     disabled={!fileStatus}
-                    onClick={() => {updateSubmitStatus('Submitted'); console.log("payload"); onSubmit()}}
+                    onClick={() => {updateSubmitStatus('Submitted'); toggleFileUploadProgressModal(true); console.log("payload"); onSubmit()}}
                     className="InputFileButton"
                   >
                     <Icon name="upload" />
@@ -705,10 +717,20 @@ function App(props) {
                     Go back
                   </Button>
                 </p>
+                <Modal open= {fileUploadProgressModal} >
+                <Segment>
+                <p className="MenuBar">
+                <Header as="h3">
+                Uploading audio file
+              </Header>
+              </p>
+              <p className="MenuBar">
+              <Progress  indicating percent = {fileUploadProgress}/>
+            </p>
+                </Segment>
+                </Modal>
               </div>
             ) : (
-
-              
 
               <div>
                 <div className="TableView">
@@ -737,6 +759,7 @@ function App(props) {
                   >
                     <Table.Header>
                       <Table.Row textAlign="center">
+                      <Table.HeaderCell>File Name</Table.HeaderCell>
                         <Table.HeaderCell>Description</Table.HeaderCell>
                         <Table.HeaderCell>Source Language</Table.HeaderCell>
                         <Table.HeaderCell>Target Language</Table.HeaderCell>
@@ -852,7 +875,7 @@ function App(props) {
                             <Dropdown
                               options={targetOptions}
                               onChange={searchTargetLanguageChosen}
-                              placeholder="Choose from dropdown"
+                              placeholder="Select language"
                               search
                             />
                             <p></p>

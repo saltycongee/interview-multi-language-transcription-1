@@ -1,12 +1,12 @@
 .UploadForm {
+  margin: auto;
   text-align: center;
   border: 1px solid black;
   box-shadow: 15px 15px 75px 30px gray;
-  width: 600px;
+  width: 30%;
   padding: 60px;
-  position: fixed; /* or absolute */
-  top: 25%;
-  left: 28%;
+  position: relative;
+  top: 50pt;
   background-image: url(Wave004.png);
   background-size: cover;
   border-radius: 30px;
@@ -21,11 +21,14 @@
 }
 
 .TableView {
-  width: max-content;
+
+  margin: auto;
+  position: relative;
+  width: 80%;
+  height: 80%;
   padding: 60px;
-  position: fixed;
-  top: 12%;
-  left: 20%;
+  top: 50pt;
+  bottom: 50pt;
   border-radius: 20px;
   box-shadow: 15px 15px 75px 30px gray;
   border: 1px solid black;
@@ -39,10 +42,10 @@
   background-color: black;
   font: inherit;
   border: 1px solid #ccc;
-  padding: 7px;
+  padding: 10px;
   cursor: pointer;
   color: white;
-  border-radius: 30px;
+  border-radius: 5px;
 }
 
 .App-logo {
@@ -66,88 +69,6 @@
   font-size: calc(10px + 2vmin);
   color: white;
 }
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-.UploadForm {
-  text-align: center;
-  border: 1px solid black;
-  box-shadow: 15px 15px 75px 30px gray;
-  width: 600px;
-  padding: 60px;
-  position: fixed; /* or absolute */
-  top: 25%;
-  left: 28%;
-  background-image: url(Wave004.png);
-  background-size: cover;
-  border-radius: 30px;
-}
-
-.MenuBar {
-  padding: 1px;
-}
-
-.Table{
-  border: 1px solid black;
-}
-
-.TableView {
-  width: max-content;
-  padding: 60px;
-  position: fixed;
-  top: 12%;
-  left: 20%;
-  border-radius: 20px;
-  box-shadow: 15px 15px 75px 30px gray;
-  border: 1px solid black;
-  background-image: url(Wave004.png);
-  background-size: cover;
-  overflow-y: scroll;
-  align-items: center;
-}
-
-.InputFileButton {
-  background-color: black;
-  font: inherit;
-  border: 1px solid #ccc;
-  padding: 7px;
-  cursor: pointer;
-  color: white;
-  border-radius: 30px;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
 
 .App-link {
   color: #61dafb;
