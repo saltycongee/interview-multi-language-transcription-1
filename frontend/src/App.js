@@ -14,7 +14,8 @@ import {
   Segment,
   Input,
   Label,
-  Progress
+  Progress,
+  Checkbox,
 } from "semantic-ui-react";
 import Login from "./Components/Authentication/Login";
 import { Hub } from "aws-amplify";
@@ -48,6 +49,8 @@ function App(props) {
     "https://3wzc0n9cbb.execute-api.us-east-1.amazonaws.com/Stage_1";
   const updateTranslationApi =
     "https://ti7db5ed14.execute-api.us-east-1.amazonaws.com/Stage_1";
+  const deleteApi =
+    "https://2op0c1k95j.execute-api.us-east-1.amazonaws.com/Stage_1";
 
   let updatePayload = {
     input: "{}",
@@ -64,7 +67,7 @@ function App(props) {
     file_name: "",
     target_language: "",
     username: "",
-    description: ""
+    description: "",
   };
 
   const [searchPayload, updateSearchPayload] = useState({
@@ -145,21 +148,28 @@ function App(props) {
     showStatus: false,
   });
 
-  const [fileUploadProgress, updateFileUploadProgress] = useState(0)
-  const [fileUploadProgressModal, toggleFileUploadProgressModal] = useState(false)
+  const [deleteFiles, updateDeleteFiles] = useState({
+    deleteMode: false,
+    username: "",
+    deleteItems: [],
+  });
+
+  const [fileUploadProgress, updateFileUploadProgress] = useState(0);
+  const [fileUploadProgressModal, toggleFileUploadProgressModal] =
+    useState(false);
 
   const [showUploadFormStatus, updateUploadFormStatus] = useState({
     showUploadForm: false,
   });
 
   const [searchedFiles, updateSearchedFiles] = useState([]);
-  const [searchedFilesLanguage, updateSearchedFilesLanguage] = useState('')
+  const [searchedFilesLanguage, updateSearchedFilesLanguage] = useState("");
   const [showAllStatus, updateShowAllStatus] = useState(true);
 
   const [maxPerPage, updateMaxPerPage] = useState(8);
   const [currentPage, updateCurrentPage] = useState(1);
 
-  const [submitStatus, updateSubmitStatus] = useState('Submit')
+  const [submitStatus, updateSubmitStatus] = useState("Submit");
 
   const [showKeyphraseSearchStatus, updateKeyphraseSearchStatus] =
     useState(false);
@@ -173,19 +183,17 @@ function App(props) {
     currentfile_name: "",
   });
 
-
   const [translationData, updateTranslationData] = useState("Loading...");
   const [translationKey, updateTranslationKey] = useState(" ");
-  
 
   const [fileStatus, updateFileStatus] = useState(true);
 
   const showEditor = translationEditorStatus.showEditor;
   const [showExtraInfo, toggleShowExtraInfo] = useState({
-    toggle:false, 
-    file_name:'',
-    keyphrases:[]
-  })
+    toggle: false,
+    file_name: "",
+    keyphrases: [],
+  });
 
   const [jobState, updateJobState] = useState({
     jobs: [],
@@ -204,7 +212,6 @@ function App(props) {
   }, []);
 
   function onFileChange(e) {
-
     file = e.target.files[0];
     let file_name = file.name;
     let fileExt = file_name.substring(
@@ -212,9 +219,9 @@ function App(props) {
       file_name.length
     );
     if (allowedExts.indexOf(fileExt) !== -1) {
-      updateFileStatus(true)
+      updateFileStatus(true);
     } else {
-      updateFileStatus(false)
+      updateFileStatus(false);
     }
   }
 
@@ -237,10 +244,9 @@ function App(props) {
 
   function sourceLanguageChosen(option) {
     payload["source_language"] = option.value;
-    console.log(option.value)
+    console.log(option.value);
     //console.log("Source Language ", option.value);
   }
-
 
   function callApi() {
     console.log("calling API");
@@ -253,7 +259,7 @@ function App(props) {
           job_name = response["data"];
           console.log("response");
           console.log(response);
-          statusPayload["job_name"] = job_name
+          statusPayload["job_name"] = job_name;
           //console.log(statusPayload["job_name"]);
           let newJob = jobState.jobs.slice();
           newJob.push({
@@ -265,8 +271,8 @@ function App(props) {
             translation_key: " ",
             source_language: payload["source_language"],
             target_language: payload["target_language"],
-            description: payload['description'],
-            keywords :[]
+            description: payload["description"],
+            keywords: [],
           });
           updateJobState({
             jobs: newJob,
@@ -274,7 +280,7 @@ function App(props) {
           toggleUploadStatus();
         })
         .catch((error) => {
-          console.log("## ERROR ##")
+          console.log("## ERROR ##");
           console.log(error);
         });
     });
@@ -282,7 +288,6 @@ function App(props) {
 
   function targetLanguageChosen(option) {
     payload["target_language"] = option.value;
-
   }
 
   function searchTargetLanguageChosen(option) {
@@ -293,15 +298,14 @@ function App(props) {
     console.log("Target Language ", searchPayload);
   }
 
-
   async function onSubmit() {
-    console.log(payload)
+    console.log(payload);
     try {
       await Storage.put(file.name, file, {
         progressCallback(progress) {
           console.log(`Uploaded: (${progress.loaded}/${progress.total})`);
-          updateFileUploadProgress((progress.loaded/progress.total)*100)
-          console.log(fileUploadProgress)
+          updateFileUploadProgress((progress.loaded / progress.total) * 100);
+          console.log(fileUploadProgress);
         },
       });
       payload.file_name = file.name;
@@ -310,8 +314,8 @@ function App(props) {
     } catch (err) {
       console.log("Error uploading file: ", err);
     }
-    updateFileUploadProgress(0)
-    toggleFileUploadProgressModal(false)
+    updateFileUploadProgress(0);
+    toggleFileUploadProgressModal(false);
   }
 
   const handleTranslationChange = (event) => {
@@ -319,10 +323,9 @@ function App(props) {
   };
 
   const handleFileNameChange = (event) => {
+    console.log(payload["translate_target"]);
 
-    console.log(payload['translate_target'])
-
-    payload['description']=event.target.value;
+    payload["description"] = event.target.value;
   };
 
   const alert = useAlert();
@@ -341,9 +344,9 @@ function App(props) {
         .then((response) => {
           updateSearchedFiles(response["data"]["searchedFiles"]);
           updateShowAllStatus(false);
-          updateSearchedFilesLanguage(response["data"]["language"])
-          console.log("response")
-          console.log(response)
+          updateSearchedFilesLanguage(response["data"]["language"]);
+          console.log("response");
+          console.log(response);
           console.log(searchedFiles);
         })
         .catch((error) => {
@@ -372,12 +375,11 @@ function App(props) {
     });
   }
 
-
-
   function fetchData() {
+    console.log("Called FETCH")
     Auth.currentSession().then((data) => {
       statusPayload["username"] = data["accessToken"]["payload"]["username"];
-      //console.log(statusPayload["username"]);
+      console.log(statusPayload["username"]);
       axios
         .post(scanApi, statusPayload)
         .then((response) => {
@@ -487,6 +489,7 @@ function App(props) {
     for (let i = 1; i <= totalPage; i++) {
       returnString.push(
         <Menu.Item
+        disabled={deleteFiles.deleteMode}
           onClick={() => {
             updateCurrentPage(i);
           }}
@@ -504,6 +507,94 @@ function App(props) {
     updateKeyphrase(event.target.value);
   };
 
+  function deleteCheckboxChange(event, job) {
+    let deleteItem = {
+      file_name: job.label.file_name,
+      target_language: job.label.target_language,
+    };
+    console.log("initial")
+    console.log(deleteFiles.deleteItems)
+    if (job.checked === true) {
+      let prevStateDeleteItemsAdd = deleteFiles.deleteItems;
+      prevStateDeleteItemsAdd.push(deleteItem);
+
+      updateDeleteFiles((prevState) => {
+        console.log(prevState);
+        return { ...prevState, deleteItems: prevStateDeleteItemsAdd };
+      });
+
+    } else {
+    
+      const index = deleteFiles.deleteItems.findIndex((element, index) => {
+        console.log(element);
+        console.log(deleteItem)
+        if (
+          (element.file_name === deleteItem.file_name) &&
+          (element.target_language === deleteItem.target_language)
+        ) 
+        {
+          console.log('inside')
+          return true;
+        }
+      });
+      console.log(index)
+
+      updateDeleteFiles((prevState) => {
+        let prevStateDeleteItemsRemove = deleteFiles.deleteItems
+        prevStateDeleteItemsRemove.splice(index, 1)
+        console.log(prevStateDeleteItemsRemove)
+        console.log(prevState);
+        return {
+          ...prevState,
+          deleteItems: prevStateDeleteItemsRemove
+        };
+      });
+    }
+    console.log("post")
+    console.log(deleteFiles.deleteItems)
+  }
+
+
+  function handleDeleteUpload(){
+    console.log('in handle delete')
+    console.log(jobState["jobs"])
+
+    for (const item of deleteFiles.deleteItems){
+      console.log(item)
+    
+
+    const index = jobState['jobs'].findIndex((element, index) => {
+      if (
+        (element.file_name === item.file_name) &&
+        (element.target_language === item.target_language)
+      ) 
+      {
+        console.log('inside')
+        return true;
+      }
+    });
+    console.log(index)
+    jobState['jobs'].splice(index, 1)
+  }
+
+    axios
+    .post(deleteApi, deleteFiles)
+    .then((response) => {
+      console.log('response');
+      console.log(response);
+    })
+    .catch((error) => {
+      console.log("### ERROR ###")
+      console.log(error);
+    });
+  
+  updateDeleteFiles((prevState) => {
+    console.log(prevState);
+    return { ...prevState, deleteMode: false, deleteItems: [] };
+  });
+  }
+  
+
   function showTable() {
     console.log(jobState);
 
@@ -516,17 +607,20 @@ function App(props) {
       totalPage = 1;
     }
 
-    console.log('searched')
-    console.log(showAllStatus)
-    console.log(searchedFilesLanguage)
+    console.log("searched");
+    console.log(showAllStatus);
+    console.log(searchedFilesLanguage);
 
-    const newRows = jobState.jobs.slice(0).reverse().filter((job, index) => ((((showAllStatus === true) && (((index/maxPerPage) < currentPage) && ((index/maxPerPage) >= (currentPage -1)))) ) || ((searchedFiles.includes(job["file_name"])) && job['target_language'] === searchedFilesLanguage))).map((job) => {
+    const newRows = jobState.jobs.slice(0).reverse().filter((job, index) => ((((showAllStatus === true) && (((index/maxPerPage) < currentPage) && ((index/maxPerPage) >= (currentPage -1)))) ) || ((searchedFiles.includes(job["file_name"])) && job['target_language'] === searchedFilesLanguage))).map((job,index) => {
         console.log(job.translationKey);
         let transcription_tokens = "";
         let translate_tokens = "";
         let transcribeKey = "";
         let translateKey = "";
-        let currentKeyphrases = (job.keyphrases === null?['COMPREHEND IS NOT COMPLETE']:job.keyphrases)
+        let currentKeyphrases =
+          job.keyphrases === null
+            ? ["COMPREHEND IS NOT COMPLETE"]
+            : job.keyphrases;
 
         if (job.transcription_key != null) {
           transcription_tokens = job.transcription_key.split("/").slice(4);
@@ -539,9 +633,9 @@ function App(props) {
         }
 
         if (
-          (job.translation_key === "In progress") ||
-          (typeof(job.translation_key) === 'undefined') ||
-          (job.translation_key === null)
+          job.translation_key === "In progress" ||
+          typeof job.translation_key === "undefined" ||
+          job.translation_key === null
         ) {
           // In progress
           translateStatus = <Icon loading name="spinner" />;
@@ -555,12 +649,16 @@ function App(props) {
           translateStatus = (
             <div>
               <Button.Group fluid compact>
-                <Button onClick={() => downloadData(translateKey)}>
+                <Button
+                  disabled={deleteFiles.deleteMode}
+                  onClick={() => downloadData(translateKey)}
+                >
                   {" "}
                   <Icon name="download" />{" "}
                 </Button>
 
                 <Button
+                  disabled={deleteFiles.deleteMode}
                   onClick={() => {
                     console.log(job);
                     console.log(currentJob);
@@ -576,8 +674,17 @@ function App(props) {
         }
 
         return (
-          <Table.Row>
-          <Table.Cell> {job.file_name} </Table.Cell>
+          <Table.Row error = {deleteFiles.deleteItems.some(e => (e.file_name === job.file_name) && (e.target_language === job.target_language) )?true:false}>
+            {deleteFiles.deleteMode ? (
+              <Table.Cell textAlign="center">
+                <Checkbox
+                id = {job.description}
+                  label={job}
+                  onChange={(event, job) => deleteCheckboxChange(event, job)}
+                />
+              </Table.Cell>
+            ) : null}
+            <Table.Cell> {job.file_name} </Table.Cell>
             <Table.Cell> {job.description} </Table.Cell>
             <Table.Cell textAlign="center">{job.source_language}</Table.Cell>
             <Table.Cell textAlign="center">{job.target_language}</Table.Cell>
@@ -586,6 +693,7 @@ function App(props) {
               {" "}
               {transcribeKey !== "" ? (
                 <Button
+                  disabled={deleteFiles.deleteMode}
                   onClick={() => downloadData(transcribeKey)}
                   compact
                   fluid
@@ -597,15 +705,27 @@ function App(props) {
                 <Icon loading name="spinner" />
               )}
             </Table.Cell>
-            <Table.Cell> {translateStatus}</Table.Cell>
-            <Table.Cell> <Button
-            onClick={() =>toggleShowExtraInfo(() => {return {toggle: true, file_name : job.file_name, keyphrases: currentKeyphrases };})}
-            compact
-            fluid
-          >
-            {" "}
-            <Icon name="plus" />
-          </Button></Table.Cell>
+            <Table.Cell > {translateStatus}</Table.Cell>
+            <Table.Cell>
+              {" "}
+              <Button
+                disabled={deleteFiles.deleteMode}
+                onClick={() =>
+                  toggleShowExtraInfo(() => {
+                    return {
+                      toggle: true,
+                      file_name: job.file_name,
+                      keyphrases: currentKeyphrases,
+                    };
+                  })
+                }
+                compact
+                fluid
+              >
+                {" "}
+                <Icon name="plus" />
+              </Button>
+            </Table.Cell>
           </Table.Row>
         );
       });
@@ -635,8 +755,6 @@ function App(props) {
             />
           )}
 
-          
-
           {currentLoginState === "signedIn" &&
             (showUploadFormStatus.showUploadForm ? (
               <div className="UploadForm">
@@ -664,25 +782,21 @@ function App(props) {
                   />
                 </p>
                 <p>
-                <Header as="h4" inverted color="grey">
-                Description:
-                </Header>
-                <Input fluid onChange={handleFileNameChange}/>
+                  <Header as="h4" inverted color="grey">
+                    Description:
+                  </Header>
+                  <Input fluid onChange={handleFileNameChange} />
                 </p>
                 <p>
-                <Header as="h4" inverted color="grey">
-                Select file:
-                </Header>
+                  <Header as="h4" inverted color="grey">
+                    Select file:
+                  </Header>
                   <input
                     type="file"
                     onChange={onFileChange}
                     className="InputFileButton"
                   />
                 </p>
-
-               
-
-
 
                 {status.showStatus ? (
                   <p>
@@ -702,7 +816,12 @@ function App(props) {
                   <Button
                     compact
                     disabled={!fileStatus}
-                    onClick={() => {updateSubmitStatus('Submitted'); toggleFileUploadProgressModal(true); console.log("payload"); onSubmit()}}
+                    onClick={() => {
+                      updateSubmitStatus("Submitted");
+                      toggleFileUploadProgressModal(true);
+                      console.log("payload");
+                      onSubmit();
+                    }}
                     className="InputFileButton"
                   >
                     <Icon name="upload" />
@@ -717,21 +836,18 @@ function App(props) {
                     Go back
                   </Button>
                 </p>
-                <Modal open= {fileUploadProgressModal} >
-                <Segment>
-                <p className="MenuBar">
-                <Header as="h3">
-                Uploading audio file
-              </Header>
-              </p>
-              <p className="MenuBar">
-              <Progress  indicating percent = {fileUploadProgress}/>
-            </p>
-                </Segment>
+                <Modal open={fileUploadProgressModal}>
+                  <Segment>
+                    <p className="MenuBar">
+                      <Header as="h3">Uploading audio file</Header>
+                    </p>
+                    <p className="MenuBar">
+                      <Progress indicating percent={fileUploadProgress} />
+                    </p>
+                  </Segment>
                 </Modal>
               </div>
             ) : (
-
               <div>
                 <div className="TableView">
                   <p className="MenuBar">
@@ -739,6 +855,17 @@ function App(props) {
                       T2 - Transcribe & Translate
                     </Header>
                     <Button
+                    circular
+                    className="InputFileButton"
+                    onClick={refreshPage}
+                    compact
+                    floated="right"
+                  >
+                    <Icon name="refresh" />
+                  </Button>{" "}
+                    
+                    <Button
+                    disabled={deleteFiles.deleteMode}
                       circular
                       floated="right"
                       compact
@@ -753,13 +880,27 @@ function App(props) {
                     ' '
                   </p>
                   <Table
+                  selectable
                     celled
+                    striped
                     class="ui inverted black table"
                     className="Table"
                   >
-                    <Table.Header>
+                    <Table.Header >
                       <Table.Row textAlign="center">
-                      <Table.HeaderCell>File Name</Table.HeaderCell>
+                        {deleteFiles.deleteMode ? (
+                          <Table.HeaderCell>
+                          <Button 
+                          compact
+                            color='red' 
+                            onClick={() =>{
+                              updateDeleteFiles((prevState) => {
+                                return {...prevState,deleteMode: !prevState.deleteMode}})
+                              handleDeleteUpload()}}>
+                            Delete?
+                          </Button></Table.HeaderCell>
+                        ) : null}
+                        <Table.HeaderCell >File Name</Table.HeaderCell>
                         <Table.HeaderCell>Description</Table.HeaderCell>
                         <Table.HeaderCell>Source Language</Table.HeaderCell>
                         <Table.HeaderCell>Target Language</Table.HeaderCell>
@@ -773,7 +914,7 @@ function App(props) {
                     <Table.Body>{showTable()}</Table.Body>
                   </Table>
 
-                  <Menu floated="left" pagination>
+                  <Menu floated="left" pagination >
                     <Menu.Item as="a" icon>
                       Page(s)
                     </Menu.Item>
@@ -791,6 +932,7 @@ function App(props) {
                       Sign Out
                     </Button>{" "}
                     <Button
+                    disabled={deleteFiles.deleteMode}
                       className="InputFileButton"
                       onClick={toggleUploadStatus}
                       compact
@@ -799,21 +941,50 @@ function App(props) {
                       <Icon name="cloud upload" />
                       Upload File
                     </Button>{" "}
-                    <Button
-                      className="InputFileButton"
-                      onClick={refreshPage}
-                      compact
+
+                    {!deleteFiles.deleteMode?
+                      <Button
                       floated="right"
-                    >
-                      <Icon name="refresh" />
-                      Refresh Table
-                    </Button>{" "}
-                  </p>
-
-
+                      compact
+                      onClick={() =>
+                        Auth.currentSession().then((data) => {
+                          updateDeleteFiles((prevState) => {
+                            console.log(prevState);
+                            return { ...prevState, username: data["accessToken"]["payload"]["username"],deleteMode: !prevState.deleteMode, };
+                          });
+                        })
                   
+                      }
+                      className="InputFileButton"
+                      color = {!deleteFiles.deleteMode? 'red': ""
+                    }
+                    >
+                      
+                      <Icon name="delete" />
+                      
+                      Delete file(s)
+                      
+                      
+                    </Button>:
+                    <Button
+                      floated="right"
+                      compact
+                      onClick={() =>
+                        Auth.currentSession().then((data) => {
+                          updateDeleteFiles((prevState) => {
+                            console.log(prevState);
+                            return { ...prevState, deleteItems: [],deleteMode: !prevState.deleteMode, };
+                          });
+                        })
+                      }
+                      className="InputFileButton"
+                    >
 
-
+                      Cancel Delete
+                    </Button>
+                    
+                    }
+                  </p>
                   <div>
                     <Modal open={showEditor}>
                       <Segment>
@@ -897,43 +1068,43 @@ function App(props) {
                     </Modal>
                   </div>
                   <div>
-                  
-                  <Modal open={showExtraInfo.toggle}>
-                  <Segment>
-                  <p className="MenuBar">
-                    <Header as="h3">
-                      Details
-                      <Button
-                        onClick={() =>     toggleShowExtraInfo(() => {
-                          return {toggle:false, file_name:'', keyphrases:[] };
-                        })}
-                        floated={"right"}
-                        circular
-                        compact
-                      >
-                        <Icon name="close" />
-                      </Button>
-                    </Header>
-                  </p>
-                </Segment>
+                    <Modal open={showExtraInfo.toggle}>
+                      <Segment>
+                        <p className="MenuBar">
+                          <Header as="h3">
+                            Details
+                            <Button
+                              onClick={() =>
+                                toggleShowExtraInfo(() => {
+                                  return {
+                                    toggle: false,
+                                    file_name: "",
+                                    keyphrases: [],
+                                  };
+                                })
+                              }
+                              floated={"right"}
+                              circular
+                              compact
+                            >
+                              <Icon name="close" />
+                            </Button>
+                          </Header>
+                        </p>
+                      </Segment>
 
-                <Segment>
-                <Header as='h5'> File Name: </Header>
-                 {showExtraInfo.file_name}
-                </Segment>
-                <Segment>
-                <Header as='h5'> Keyphrases: </Header>
-                
-                {showExtraInfo.keyphrases.map((keyphrase) => (
-                  <Label>{keyphrase}</Label>
-                  ))
-              }
-                
-                
-                </Segment>
-                
+                      <Segment>
+                        <Header as="h5"> File Name: </Header>
+                        {showExtraInfo.file_name}
+                      </Segment>
+                      <Segment>
+                        <Header as="h5"> Keyphrases: </Header>
 
-                  </Modal>
+                        {showExtraInfo.keyphrases.map((keyphrase) => (
+                          <Label>{keyphrase}</Label>
+                        ))}
+                      </Segment>
+                    </Modal>
                   </div>
                 </div>
               </div>
