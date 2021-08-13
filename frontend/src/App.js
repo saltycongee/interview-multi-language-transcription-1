@@ -38,7 +38,7 @@ function App(props) {
     Storage: {
       AWSS3: {
         bucket: "la-presse-main-bucket", //REQUIRED -  Amazon S3 bucket name
-        region: "us-east-1", //OPTIONAL -  Amazon service region
+        region: "us-west-2", //OPTIONAL -  Amazon service region
       },
     },
   });
