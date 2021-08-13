@@ -1,0 +1,924 @@
+#Added:
+#functions
+#API
+#RDS
+#StepFunc
+
+
+
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: "T2 Template v1"
+
+Parameters:
+
+  S3BucketName:
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    ConstraintDescription: Must begin with a letter and contain only alphanumeric characters
+    Description: S3 bucket name
+    MaxLength: 60
+    MinLength: 1
+    Type: String
+
+  databaseInstanceIdentifier:
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    ConstraintDescription: Must begin with a letter and contain only alphanumeric characters
+    Default: lpdb
+    Description: Instance identifier name
+    MaxLength: 60
+    MinLength: 1
+    Type: String
+
+  DatabaseName:
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    ConstraintDescription: Must begin with a letter and contain only alphanumeric characters
+    Default: applicationdb2
+    Description: MySQL database name
+    MaxLength: 64
+    MinLength: 1
+    Type: String
+
+  DatabaseUser:
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    ConstraintDescription: Must begin with a letter and contain only alphanumeric characters
+    Default: t2admin
+    Description: Username for MySQL database access
+    MaxLength: 16
+    MinLength: 1
+    Type: String
+
+  DatabasePassword:
+    AllowedPattern: '[a-zA-Z0-9]*'
+    ConstraintDescription: Must contain only alphanumeric characters
+    Default: t2password
+    Description: Password for MySQL database access
+    MaxLength: 41
+    MinLength: 8
+    NoEcho: true
+    Type: String
+  
+  DatabaseMainTable:
+    AllowedPattern: '[a-zA-Z0-9]*'
+    ConstraintDescription: Must contain only alphanumeric characters
+    Default: t2MainTable
+    Description: Main table name
+    MaxLength: 41
+    MinLength: 8
+    Type: String
+
+Resources:
+  asyncFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: 
+        S3Bucket: !Ref S3BucketName
+        S3Key: functions/1asyncFunction.zip
+      Role: !GetAtt lambdaIamRole.Arn
+      Runtime: python3.8
+      Handler: 1asyncFunction.lambda_handler
+
+  translationStatus:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: 
+        S3Bucket: !Ref S3BucketName
+        S3Key: functions/2transcriptionStatus.zip
+      Role: !GetAtt lambdaIamRole.Arn
+      Runtime: python3.8
+      Handler: 2transcriptionStatus.lambda_handler
+
+  postTranslation:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: 
+        S3Bucket: !Ref S3BucketName
+        S3Key: functions/3postTranscription.zip
+      Role: !GetAtt lambdaIamRole.Arn
+      Runtime: python3.8
+      Handler: 3postTranscription.lambda_handler 
+
+  transaltionStatus:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: 
+        S3Bucket: !Ref S3BucketName
+        S3Key: functions/4translationStatus.zip
+      Role: !GetAtt lambdaIamRole.Arn
+      Runtime: python3.8
+      Handler: 4translationStatus.lambda_handler
+
+  postTranslation:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: 
+        S3Bucket: !Ref S3BucketName
+        S3Key: functions/5postTranslation.zip
+      Role: !GetAtt lambdaIamRole.Arn
+      Runtime: python3.8
+      Handler: 5postTranslation.lambda_handler
+
+  comprehendFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: 
+        S3Bucket: !Ref S3BucketName
+        S3Key: functions/6comprehendFunction.zip
+      Role: !GetAtt lambdaIamRole.Arn
+      Runtime: python3.8
+      Handler: 6comprehendFunction.lambda_handler 
+
+  updateAfterComp:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: 
+        S3Bucket: !Ref S3BucketName
+        S3Key: functions/7updateAfterComp.zip
+      Role: !GetAtt lambdaIamRole.Arn
+      Runtime: python3.8
+      Handler: 7updateAfterComp.lambda_handler
+    
+
+  scanFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: 
+        S3Bucket: !Ref S3BucketName
+        S3Key: functions/8scanFunction.zip
+      Role: !GetAtt lambdaIamRole.Arn
+      Runtime: python3.8
+      Handler: 8scanFunction.lambda_handler
+    
+
+  deleteFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: 
+        S3Bucket: !Ref S3BucketName
+        S3Key: functions/9deleteFunction.zip
+      Role: !GetAtt lambdaIamRole.Arn
+      Runtime: python3.8
+      Handler: 9deleteFunction.lambda_handler
+    
+
+  searchFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: 
+        S3Bucket: !Ref S3BucketName
+        S3Key: functions/10searchFunction.zip
+      Role: !GetAtt lambdaIamRole.Arn
+      Runtime: python3.8
+      Handler: 10searchFunction.lambda_handler
+    DependsOn: databaseInstance
+
+  createTableFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: 
+        S3Bucket: !Ref S3BucketName
+        S3Key: functions/11createTable.zip
+      Role: !GetAtt lambdaIamRole.Arn
+      Runtime: python3.8
+      Handler: 11createTable.lambda_handler
+    DependsOn: databaseInstance
+
+  databaseCluster: 
+    Type: AWS::RDS::DBCluster
+    Properties:
+      DatabaseName: !Ref DatabaseName
+      Engine: aurora-postgresql
+      MasterUsername: !Ref DatabaseUser
+      MasterUserPassword: !Ref DatabasePassword
+
+  databaseInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBClusterIdentifier: !Ref databaseCluster
+      DBInstanceClass: db.r5.large
+      DBInstanceIdentifier: !Ref databaseInstanceIdentifier
+      Engine: aurora-postgresql
+
+  DBHostParameter:
+    Type: AWS::SSM::Parameter
+    Properties: 
+      DataType: text
+      Description: Host Address
+      Name: t2-db-host
+      Type: String
+      Value: !GetAtt [databaseInstance, Endpoint.Address]
+    DependsOn: databaseInstance
+
+  DBUserParameter:
+    Type: AWS::SSM::Parameter
+    Properties: 
+      DataType: text
+      Description: Username
+      Name: t2-db-user
+      Type: String
+      Value: !Ref DatabaseUser
+
+  DBPasswordParameter:
+    Type: AWS::SSM::Parameter
+    Properties: 
+      DataType: text
+      Description: Password
+      Name: t2-db-password
+      Type: String
+      Value: !Ref DatabasePassword
+
+  DBDatabaseParameter:
+    Type: AWS::SSM::Parameter
+    Properties: 
+      DataType: text
+      Description: Database name
+      Name: t2-db-dbname
+      Type: String
+      Value: !Ref DatabaseName
+
+  DBPortParameter:
+    Type: AWS::SSM::Parameter
+    Properties: 
+      DataType: text
+      Description: Host Address
+      Name: t2-db-port
+      Type: String
+      Value: !GetAtt [databaseInstance, Endpoint.Port]
+    DependsOn: databaseInstance
+
+  DBTableNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties: 
+      DataType: text
+      Description: Host Address
+      Name: t2-db-tablename
+      Type: String
+      Value: !Ref DatabaseMainTable
+
+  lambdaIamRole: 
+    Type: "AWS::IAM::Role"
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "lambda.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      - arn:aws:iam::aws:policy/AWSStepFunctionsFullAccess
+      - arn:aws:iam::aws:policy/ComprehendFullAccess
+      - arn:aws:iam::aws:policy/AmazonTranscribeFullAccess
+      - arn:aws:iam::aws:policy/AmazonS3FullAccess
+
+  
+  scanApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      ApiKeySourceType: HEADER
+      Description: An API Gateway with a Lambda Integration
+      Name: scan-api 
+  scanApiGatewayResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt scanApi.RootResourceId
+      PathPart: path
+      RestApiId: !Ref scanApi
+  scanApiGatewayMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: ANY
+      RequestParameters:
+        method.request.path.userId: true
+      Integration:
+        Credentials: !GetAtt ApiGatewayIamRole.Arn
+        IntegrationHttpMethod: POST
+        IntegrationResponses:
+          - ResponseTemplates: {"application/json": ""}
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Credentials: "'true'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            StatusCode: 200
+        PassthroughBehavior: WHEN_NO_TEMPLATES
+        TimeoutInMillis: 29000
+        Type: AWS
+        Uri: !Sub
+          - 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations'
+          - lambdaArn: !GetAtt "scanFunction.Arn"
+      MethodResponses: 
+        - ResponseModels: 
+            application/json : 'Empty'
+          ResponseParameters: 
+            method.response.header.Access-Control-Allow-Credentials: false
+            method.response.header.Access-Control-Allow-Headers: false
+            method.response.header.Access-Control-Allow-Methods: false
+            method.response.header.Access-Control-Allow-Origin: false
+          StatusCode: 200  
+      OperationName: 'operation name'
+      ResourceId: !Ref scanApiGatewayResource
+      RestApiId: !Ref scanApi
+  AscanpiGatewayModel:
+    Type: AWS::ApiGateway::Model
+    Properties:
+      ContentType: 'application/json'
+      RestApiId: !Ref scanApi
+      Schema: {}
+  scanApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: scanApiGatewayMethod
+    Properties:
+      Description: Lambda API Deployment
+      RestApiId: !Ref scanApi
+  scanApiGatewayStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      DeploymentId: !Ref scanApiGatewayDeployment
+      Description: Lambda API Stage
+      RestApiId: !Ref scanApi
+      StageName: dev
+
+  deleteApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      ApiKeySourceType: HEADER
+      Description: An API Gateway with a Lambda Integration
+      Name: delete-api 
+  deleteApiGatewayResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt deleteApi.RootResourceId
+      PathPart: path
+      RestApiId: !Ref deleteApi
+  deleteApiGatewayMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: ANY
+      RequestParameters:
+        method.request.path.userId: true
+      Integration:
+        Credentials: !GetAtt ApiGatewayIamRole.Arn
+        IntegrationHttpMethod: POST
+        IntegrationResponses:
+          - ResponseTemplates: {"application/json": ""}
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Credentials: "'true'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            StatusCode: 200
+        PassthroughBehavior: WHEN_NO_TEMPLATES
+        TimeoutInMillis: 29000
+        Type: AWS
+        Uri: !Sub
+          - 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations'
+          - lambdaArn: !GetAtt "deleteFunction.Arn"
+      MethodResponses: 
+        - ResponseModels: 
+            application/json : 'Empty'
+          ResponseParameters: 
+            method.response.header.Access-Control-Allow-Credentials: false
+            method.response.header.Access-Control-Allow-Headers: false
+            method.response.header.Access-Control-Allow-Methods: false
+            method.response.header.Access-Control-Allow-Origin: false
+          StatusCode: 200  
+      OperationName: 'operation name'
+      ResourceId: !Ref deleteApiGatewayResource
+      RestApiId: !Ref deleteApi
+  deleteApiGatewayModel:
+    Type: AWS::ApiGateway::Model
+    Properties:
+      ContentType: 'application/json'
+      RestApiId: !Ref deleteApi
+      Schema: {}
+  deleteApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: deleteApiGatewayMethod
+    Properties:
+      Description: Lambda API Deployment
+      RestApiId: !Ref deleteApi
+  deleteApiGatewayStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      DeploymentId: !Ref deleteApiGatewayDeployment
+      Description: Lambda API Stage
+      RestApiId: !Ref deleteApi
+      StageName: dev
+  
+  searchApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      ApiKeySourceType: HEADER
+      Description: An API Gateway with a Lambda Integration
+      Name: search-api 
+  searchApiGatewayResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt searchApi.RootResourceId
+      PathPart: path
+      RestApiId: !Ref searchApi
+  searchApiGatewayMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: ANY
+      RequestParameters:
+        method.request.path.userId: true
+      Integration:
+        Credentials: !GetAtt ApiGatewayIamRole.Arn
+        IntegrationHttpMethod: POST
+        IntegrationResponses:
+          - ResponseTemplates: {"application/json": ""}
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Credentials: "'true'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            StatusCode: 200
+        PassthroughBehavior: WHEN_NO_TEMPLATES
+        TimeoutInMillis: 29000
+        Type: AWS
+        Uri: !Sub
+          - 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations'
+          - lambdaArn: !GetAtt "searchFunction.Arn"
+      MethodResponses: 
+        - ResponseModels: 
+            application/json : 'Empty'
+          ResponseParameters: 
+            method.response.header.Access-Control-Allow-Credentials: false
+            method.response.header.Access-Control-Allow-Headers: false
+            method.response.header.Access-Control-Allow-Methods: false
+            method.response.header.Access-Control-Allow-Origin: false
+          StatusCode: 200  
+      OperationName: 'operation name'
+      ResourceId: !Ref searchApiGatewayResource
+      RestApiId: !Ref searchApi
+  searchApiGatewayModel:
+    Type: AWS::ApiGateway::Model
+    Properties:
+      ContentType: 'application/json'
+      RestApiId: !Ref searchApi
+      Schema: {}
+  searchApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: searchApiGatewayMethod
+    Properties:
+      Description: Lambda API Deployment
+      RestApiId: !Ref searchApi
+  searchApiGatewayStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      DeploymentId: !Ref searchApiGatewayDeployment
+      Description: Lambda API Stage
+      RestApiId: !Ref searchApi
+      StageName: dev
+  
+  userInputApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      ApiKeySourceType: HEADER
+      Description: An API Gateway with a Lambda Integration
+      Name: userInput-api 
+  userInputApiGatewayResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt userInputApi.RootResourceId
+      PathPart: path
+      RestApiId: !Ref userInputApi
+  userInputApiGatewayMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: ANY
+      RequestParameters:
+        method.request.path.userId: true
+      Integration:
+        Credentials: !GetAtt ApiGatewayIamRole.Arn
+        IntegrationHttpMethod: POST
+        IntegrationResponses:
+          - ResponseTemplates: {"application/json": ""}
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Credentials: "'true'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            StatusCode: 200
+        PassthroughBehavior: WHEN_NO_TEMPLATES
+        TimeoutInMillis: 29000
+        Type: AWS
+        Uri: !Sub
+          - 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations'
+          - lambdaArn: !GetAtt "asyncFunction.Arn"
+      MethodResponses: 
+        - ResponseModels: 
+            application/json : 'Empty'
+          ResponseParameters: 
+            method.response.header.Access-Control-Allow-Credentials: false
+            method.response.header.Access-Control-Allow-Headers: false
+            method.response.header.Access-Control-Allow-Methods: false
+            method.response.header.Access-Control-Allow-Origin: false
+          StatusCode: 200  
+      OperationName: 'operation name'
+      ResourceId: !Ref userInputApiGatewayResource
+      RestApiId: !Ref userInputApi
+  userInputApiGatewayModel:
+    Type: AWS::ApiGateway::Model
+    Properties:
+      ContentType: 'application/json'
+      RestApiId: !Ref userInputApi
+      Schema: {}
+  userInputApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: userInputApiGatewayMethod
+    Properties:
+      Description: Lambda API Deployment
+      RestApiId: !Ref userInputApi
+  userInputApiGatewayStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      DeploymentId: !Ref userInputApiGatewayDeployment
+      Description: Lambda API Stage
+      RestApiId: !Ref userInputApi
+      StageName: dev
+  
+  compAfterEditApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      ApiKeySourceType: HEADER
+      Description: An API Gateway with a Lambda Integration
+      Name: compAfterEdit-api 
+  compAfterEditApiGatewayResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt compAfterEditApi.RootResourceId
+      PathPart: path
+      RestApiId: !Ref compAfterEditApi
+  compAfterEditApiGatewayMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: ANY
+      RequestParameters:
+        method.request.path.userId: true
+      Integration:
+        Credentials: !GetAtt ApiGatewayIamRole.Arn
+        IntegrationHttpMethod: POST
+        IntegrationResponses:
+          - ResponseTemplates: {"application/json": ""}
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Credentials: "'true'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            StatusCode: 200
+        PassthroughBehavior: WHEN_NO_TEMPLATES
+        TimeoutInMillis: 29000
+        Type: AWS
+        Uri: !Sub
+          - 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations'
+          - lambdaArn: !GetAtt "comprehendFunction.Arn"
+      MethodResponses: 
+        - ResponseModels: 
+            application/json : 'Empty'
+          ResponseParameters: 
+            method.response.header.Access-Control-Allow-Credentials: false
+            method.response.header.Access-Control-Allow-Headers: false
+            method.response.header.Access-Control-Allow-Methods: false
+            method.response.header.Access-Control-Allow-Origin: false
+          StatusCode: 200  
+      OperationName: 'operation name'
+      ResourceId: !Ref compAfterEditApiGatewayResource
+      RestApiId: !Ref compAfterEditApi
+  compAfterEditApiGatewayModel:
+    Type: AWS::ApiGateway::Model
+    Properties:
+      ContentType: 'application/json'
+      RestApiId: !Ref compAfterEditApi
+      Schema: {}
+  compAfterEditApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: compAfterEditApiGatewayMethod
+    Properties:
+      Description: Lambda API Deployment
+      RestApiId: !Ref compAfterEditApi
+  compAfterEditApiGatewayStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      DeploymentId: !Ref compAfterEditApiGatewayDeployment
+      Description: Lambda API Stage
+      RestApiId: !Ref compAfterEditApi
+      StageName: dev
+
+  ApiGatewayIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: ''
+            Effect: 'Allow'
+            Principal:
+              Service:
+                - 'apigateway.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+      Path: '/'
+
+  ApiGatewayPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: "LambdaAccess"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        -
+          Effect: 'Allow'
+          Action: 'lambda:*'
+          Resource: 
+            - !GetAtt scanFunction.Arn
+            - !GetAtt deleteFunction.Arn
+            - !GetAtt asyncFunction.Arn
+            - !GetAtt searchFunction.Arn
+      Roles: 
+      - 
+        !Ref ApiGatewayIamRole
+
+  StatesExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - !Sub states.${AWS::Region}.amazonaws.com
+            Action: "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: StatesExecutionPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "lambda:InvokeFunction"
+                Resource: "*"
+
+  StateMachine:
+    Type: "AWS::StepFunctions::StateMachine"
+    DependsOn: 
+      - translationStatus
+      - postTranscription
+      - translationStatus
+      - postTranslation
+      - comprehendFunction
+      - updateAfterComp
+    Properties:
+      RoleArn: !GetAtt [ StatesExecutionRole, Arn ]
+      DefinitionString:
+        !Sub |-
+            {
+              "Comment": "Polling step function for translate job complete",
+              "StartAt": "Transcription Status",
+              "States": {
+                "Transcription Status": {
+                  "Type": "Task",
+                  "Resource": "${transcriptionStatus.Arn}",
+                  "InputPath": "$.job_name",
+                  "ResultPath": "$.transcription_status",
+                  "Next": "Transcription Job Complete?",
+                  "Retry": [
+                    {
+                      "ErrorEquals": [
+                        "States.ALL"
+                      ],
+                      "IntervalSeconds": 1,
+                      "MaxAttempts": 3,
+                      "BackoffRate": 2
+                    }
+                  ]
+                },
+                "Transcription Job Complete?": {
+                  "Type": "Choice",
+                  "Choices": [
+                    {
+                      "Variable": "$.transcription_status.transcription_status",
+                      "StringEquals": "IN_PROGRESS",
+                      "Next": "Wait X Seconds 1"
+                    },
+                    {
+                      "Variable": "$.transcription_status.transcription_status",
+                      "StringEquals": "SUBMITTED",
+                      "Next": "Wait X Seconds 1"
+                    },
+                    {
+                      "Variable": "$.transcription_status.transcription_status",
+                      "StringEquals": "COMPLETED",
+                      "Next": "Post Transcription"
+                    },
+                    {
+                      "Variable": "$.transcription_status.transcription_status",
+                      "StringEquals": "FAILED",
+                      "Next": "Post Transcription"
+                    },
+                    {
+                      "Variable": "$.transcription_status.transcription_status",
+                      "StringEquals": "STOPPED",
+                      "Next": "Post Transcription"
+                    }
+                  ],
+                  "Default": "Wait X Seconds 1"
+                },
+                "Wait X Seconds 1": {
+                  "Type": "Wait",
+                  "Seconds": 60,
+                  "Next": "Transcription Status"
+                },
+                "Post Transcription": {
+                  "Type": "Task",
+                  "Resource": "${postTranscription.Arn}",
+                  "InputPath": "$",
+                  "ResultPath": "$.translation_JobId",
+                  "Next": "LambdaPoll",
+                  "Retry": [
+                    {
+                      "ErrorEquals": [
+                        "States.ALL"
+                      ],
+                      "IntervalSeconds": 1,
+                      "MaxAttempts": 3,
+                      "BackoffRate": 2
+                    }
+                  ]
+                },
+                "LambdaPoll": {
+                  "Type": "Task",
+                  "Resource": "${tranlationStatus.Arn}",
+                  "InputPath": "$.translation_JobId",
+                  "ResultPath": "$.translation_status",
+                  "Next": "Job Complete?",
+                  "Retry": [
+                    {
+                      "ErrorEquals": [
+                        "States.ALL"
+                      ],
+                      "IntervalSeconds": 1,
+                      "MaxAttempts": 3,
+                      "BackoffRate": 2
+                    }
+                  ]
+                },
+                "Job Complete?": {
+                  "Type": "Choice",
+                  "Choices": [
+                    {
+                      "Variable": "$.translation_status",
+                      "StringEquals": "IN_PROGRESS",
+                      "Next": "Wait X Seconds"
+                    },
+                    {
+                      "Variable": "$.translation_status",
+                      "StringEquals": "SUBMITTED",
+                      "Next": "Wait X Seconds"
+                    },
+                    {
+                      "Variable": "$.translation_status",
+                      "StringEquals": "COMPLETED",
+                      "Next": "Update Database"
+                    },
+                    {
+                      "Variable": "$.translation_status",
+                      "StringEquals": "FAILED",
+                      "Next": "Update Database"
+                    },
+                    {
+                      "Variable": "$.translation_status",
+                      "StringEquals": "STOPPED",
+                      "Next": "Update Database"
+                    }
+                  ],
+                  "Default": "Wait X Seconds"
+                },
+                "Wait X Seconds": {
+                  "Type": "Wait",
+                  "Seconds": 60,
+                  "Next": "LambdaPoll"
+                },
+                "Update Database": {
+                  "Type": "Task",
+                  "Resource": "${postTranslation.Arn}",
+                  "InputPath": "$",
+                  "ResultPath": "$.s3url",
+                  "Next": "Comprehend Keyphrases",
+                  "Retry": [
+                    {
+                      "ErrorEquals": [
+                        "States.ALL"
+                      ],
+                      "IntervalSeconds": 1,
+                      "MaxAttempts": 3,
+                      "BackoffRate": 2
+                    }
+                  ]
+                },
+                "Comprehend Keyphrases": {
+                  "Type": "Task",
+                  "Resource": "${comprehendFunction.Arn}",
+                  "InputPath": "$.s3url",
+                  "ResultPath": "$.keyphrases",
+                  "Next": "Add to SQL Database",
+                  "Retry": [
+                    {
+                      "ErrorEquals": [
+                        "States.ALL"
+                      ],
+                      "IntervalSeconds": 1,
+                      "MaxAttempts": 3,
+                      "BackoffRate": 2
+                    }
+                  ]
+                },
+                "Add to SQL Database": {
+                  "Type": "Task",
+                  "Resource": "${updateAfterComp.Arn}",
+                  "InputPath": "$",
+                  "ResultPath": "$.result",
+                  "Retry": [
+                    {
+                      "ErrorEquals": [
+                        "States.ALL"
+                      ],
+                      "IntervalSeconds": 1,
+                      "MaxAttempts": 3,
+                      "BackoffRate": 2
+                    }
+                  ],
+                  "End": true
+                }
+              }
+            }
+      
+
+  StateMachine:
+    Type: "AWS::StepFunctions::StateMachine"
+    DependsOn: 
+      - comprehendFunction
+      - updateAfterComp
+    Properties:
+      RoleArn: !GetAtt [ StatesExecutionRole, Arn ]
+      DefinitionString:
+        !Sub |-
+            {
+              "Comment": "Polling step function for translate job complete",
+              "StartAt": "Comprehend Keyphrases",
+              "States": {
+                "Comprehend Keyphrases": {
+                  "Type": "Task",
+                  "Resource": "${comprehendFunction.Arn}",
+                  "InputPath": "$.s3url",
+                  "ResultPath": "$.keyphrases",
+                  "Next": "Add to SQL Database",
+                  "Retry": [
+                    {
+                      "ErrorEquals": [
+                        "States.ALL"
+                      ],
+                      "IntervalSeconds": 1,
+                      "MaxAttempts": 3,
+                      "BackoffRate": 2
+                    }
+                  ]
+                  
+                },
+                "Add to SQL Database": {
+                  "Type": "Task",
+                  "Resource": "${updateAfterComp.Arn}",
+                  "InputPath": "$",
+                  "ResultPath": "$.result",
+                  "Retry": [
+                    {
+                      "ErrorEquals": [
+                        "States.ALL"
+                      ],
+                      "IntervalSeconds": 1,
+                      "MaxAttempts": 3,
+                      "BackoffRate": 2
+                    }
+                  ], 
+                  "End": true
+                }
+              }
+            }  
+
