@@ -47,7 +47,7 @@ function App(props) {
   let variable = process.env.REACT_APP_SCAN_API
 
   const api = "https://c4r8tzi2r4.execute-api.us-east-1.amazonaws.com/dev";
-  const scanApi = "https://0opz07581b.execute-api.us-east-1.amazonaws.com/dev";
+  const scanApi = REACT_APP_SCAN_API;
   const searchApi =
     "https://3wzc0n9cbb.execute-api.us-east-1.amazonaws.com/Stage_1";
   const updateTranslationApi =
@@ -903,7 +903,7 @@ function App(props) {
                             Delete?
                           </Button></Table.HeaderCell>
                         ) : null}
-                        <Table.HeaderCell >Variable</Table.HeaderCell>
+                        <Table.HeaderCell >{Variable}</Table.HeaderCell>
                         <Table.HeaderCell>Description</Table.HeaderCell>
                         <Table.HeaderCell>Source Language</Table.HeaderCell>
                         <Table.HeaderCell>Target Language</Table.HeaderCell>
