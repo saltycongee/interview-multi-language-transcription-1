@@ -903,7 +903,7 @@ function App(props) {
                             Delete?
                           </Button></Table.HeaderCell>
                         ) : null}
-                        <Table.HeaderCell >{Variable}</Table.HeaderCell>
+                        <Table.HeaderCell >{variable}</Table.HeaderCell>
                         <Table.HeaderCell>Description</Table.HeaderCell>
                         <Table.HeaderCell>Source Language</Table.HeaderCell>
                         <Table.HeaderCell>Target Language</Table.HeaderCell>
