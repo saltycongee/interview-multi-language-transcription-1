@@ -14,8 +14,7 @@ applications:
             - npm ci
         build:
           commands:
-            - REACT_APP_SCAN_API=${THISISit}
-            - REACT_USER_INPUT_API=$(aws ssm get-parameter --name userInputApiEndpointParameter --query Parameter.Value --output text || echo "ok2")
+
             - npm run build
       artifacts:
         baseDirectory: build
