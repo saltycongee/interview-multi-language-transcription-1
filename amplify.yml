@@ -5,8 +5,12 @@ applications:
         build:
           commands:
             - '# Execute Amplify CLI with the helper script'
-
             - amplifyPush --simple
+        postBuild:
+          commands:
+            - REACT_SCAN_API=$(aws ssm get-parameter --name scanApiEndpointParameter --query Parameter.Value --output text)
+            - REACT_USER_INPUT_API=$(aws ssm get-parameter --name userInputApiEndpointParameter --query Parameter.Value --output text)
+
     frontend:
       phases:
         preBuild:
