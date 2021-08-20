@@ -1,5 +1,9 @@
 version: 1
 applications:
+  - env:
+    variables:
+      REACT_APP_SCAN_API: $(aws ssm get-parameter --name scanApiEndpointParameter --query Parameter.Value --output text || echo "")
+      REACT_USER_INPUT_API: $(aws ssm get-parameter --name /userInputApiEndpointParameter --query Parameter.Value --output text || echo "")
   - backend:
       phases:
         build:
