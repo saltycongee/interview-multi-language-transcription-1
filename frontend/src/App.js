@@ -47,7 +47,7 @@ function App(props) {
 
 
   const api = "https://c4r8tzi2r4.execute-api.us-east-1.amazonaws.com/dev";
-  const scanApi = REACT_APP_SCAN_API;
+  const scanApi = 'REACT_APP_SCAN_API';
   const searchApi =
     "https://3wzc0n9cbb.execute-api.us-east-1.amazonaws.com/Stage_1";
   const updateTranslationApi =
