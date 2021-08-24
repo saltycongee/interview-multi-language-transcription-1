@@ -43,6 +43,10 @@ function App(props) {
     },
   });
 
+  console.log("ENV")
+  console.log(process.env.REACT_APP_SCAN_API)
+  console.log(process.env.REACT_APP_USER_INPUT_API)
+
   const api = "https://c4r8tzi2r4.execute-api.us-east-1.amazonaws.com/dev";
   const scanApi = "https://0opz07581b.execute-api.us-east-1.amazonaws.com/dev";
   const searchApi =
