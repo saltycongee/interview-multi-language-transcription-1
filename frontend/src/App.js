@@ -33,7 +33,7 @@ console.log(process.env.REACT_APP_REGION)
 
 function App(props) {
 
-  Amplify.configure(config);
+  Amplify.configure();
   // From AWS
   Amplify.configure({
     Storage: {
