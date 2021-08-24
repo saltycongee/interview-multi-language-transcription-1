@@ -28,38 +28,32 @@ import { useAlert } from "react-alert";
 import Dropdown from "react-dropdown";
 //import mainTable from "./Components/mainTable"
 
+
+console.log(process.env.REACT_APP_REGION)
+
 function App(props) {
+
+  Amplify.configure(config);
   // From AWS
   Amplify.configure({
-    Auth: {
-      identityPoolId: "us-east-1:154afb63-c1a1-4b7d-b047-7273d030e4bf", //REQUIRED - Amazon Cognito Identity Pool ID
-      region: "us-east-1", // REQUIRED - Amazon Cognito Region
-    },
     Storage: {
       AWSS3: {
-        bucket: "la-presse-main-bucket", //REQUIRED -  Amazon S3 bucket name
-        region: "us-east-1", //OPTIONAL -  Amazon service region
+        bucket: process.env.REACT_APP_S3_BUCKET, //REQUIRED -  Amazon S3 bucket name
+        region: process.env.REACT_APP_REGION, //OPTIONAL -  Amazon service region
       },
     },
   });
 
-  console.log("ENV")
-  console.log(process.env.REACT_APP_SCAN_API)
-  console.log(process.env.REACT_APP_USER_INPUT_API)
-
-  const api = "https://c4r8tzi2r4.execute-api.us-east-1.amazonaws.com/dev";
-  const scanApi = "https://0opz07581b.execute-api.us-east-1.amazonaws.com/dev";
-  const searchApi =
-    "https://3wzc0n9cbb.execute-api.us-east-1.amazonaws.com/Stage_1";
-  const updateTranslationApi =
-    "https://ti7db5ed14.execute-api.us-east-1.amazonaws.com/Stage_1";
-  const deleteApi =
-    "https://2op0c1k95j.execute-api.us-east-1.amazonaws.com/Stage_1";
+  const api = process.env.REACT_APP_USER_INPUT_API;
+  const scanApi = process.env.REACT_APP_SCAN_API;
+  const searchApi = process.env.REACT_APP_SEARCH_API;
+  const updateTranslationApi = process.env.REACT_APP_UPDATE_API;
+  const deleteApi =process.env.REACT_APP_DELETE_API;
 
   let updatePayload = {
     input: "{}",
     stateMachineArn:
-      "arn:aws:states:us-east-1:313039493322:stateMachine:LaPresse-UpdatedTranslations",
+    process.env.REACT_APP_COMP_STATE_MACHINE,
   };
 
   let totalPage = 1;
