@@ -90,6 +90,7 @@ function App(props) {
 
   const sourceOptions = [
     { value: "en-US", label: "English (US)" },
+    { value: "fr-CA", label: "French (CA)" },
     { value: "fr-FR", label: "French (FR)" },
     { value: "af-ZA", label: "Afrikaans" },
     { value: "ar-AE", label: "Arabic (AE)" },
@@ -108,7 +109,6 @@ function App(props) {
     { value: "es-ES", label: "Spanish (ES)" },
     { value: "es-US", label: "Spanish (US)" },
     { value: "fa-IR", label: "Farsi" },
-    { value: "fr-CA", label: "French (FR)" },
     { value: "he-IL", label: "Hebrew" },
 
     { value: "hi-IN", label: "Hindi" },

@@ -11,7 +11,7 @@ The T2 - Transcription and Translation tool enables users to upload audio and vi
 
 ## Deployment
 
-[Backend Stack Deployment](/docs/backend-README.md) (points to the historical audio processing repository)\
+[Backend Stack Deployment](/docs/backend-README.md)
 [Frontend Stack Deployment](/docs/frontend-README.md)
 
 ## Credits
