@@ -1,0 +1,38 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-lapresse-dev-214654-authRole",
+      "UnauthRoleArn": "arn:aws:iam::313039493322:role/amplify-lapresse-dev-214654-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::313039493322:role/amplify-lapresse-dev-214654-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-lapresse-dev-214654-deployment",
+      "UnauthRoleName": "amplify-lapresse-dev-214654-unauthRole",
+      "StackName": "amplify-lapresse-dev-214654",
+      "StackId": "arn:aws:cloudformation:us-east-1:313039493322:stack/amplify-lapresse-dev-214654/0614c7f0-8164-11eb-badf-1201663355d3",
+      "AmplifyAppId": "dwy11kpm1vumb"
+    },
+    "categories": {
+      "auth": {
+        "lapressed7cbb58b": {}
+      }
+    }
+  },
+  "maintest": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-lapresse-maintest-20901-authRole",
+      "UnauthRoleArn": "arn:aws:iam::313039493322:role/amplify-lapresse-maintest-20901-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::313039493322:role/amplify-lapresse-maintest-20901-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-lapresse-maintest-20901-deployment",
+      "UnauthRoleName": "amplify-lapresse-maintest-20901-unauthRole",
+      "StackName": "amplify-lapresse-maintest-20901",
+      "StackId": "arn:aws:cloudformation:us-east-1:313039493322:stack/amplify-lapresse-maintest-20901/fcdb6450-e482-11eb-bc42-0ea47a628cf7",
+      "AmplifyAppId": "d97ucevky39nc"
+    },
+    "categories": {
+      "auth": {
+        "lapressed7cbb58b": {}
+      }
+    }
+  }
+}

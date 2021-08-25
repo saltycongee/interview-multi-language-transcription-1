@@ -1,0 +1,10 @@
+{
+  "auth": {
+    "lapressed7cbb58b": {
+      "service": "Cognito",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "customAuth": false
+    }
+  }
+}
