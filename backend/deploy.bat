@@ -4,11 +4,9 @@
 SET tempvar1=%~1
 SET tempvar2=%~2
 SET tempvar3=%~3
-SET tempvar4=%~4
 SET aws-region=%tempvar1:~11,250%
 SET aws-profile=%tempvar2:~12,250%
 SET stack-name=%tempvar3:~11,250%
-SET bucket-name=%tempvar2:~11,250%
 
 ECHO Deployment region: %aws-region% 
 

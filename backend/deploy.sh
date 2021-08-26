@@ -1,11 +1,8 @@
-bucketName=${2}
-awsRegion=${4}
-awsProfile=${6}
-stackName=${8}
+awsRegion=${2}
+awsProfile=${4}
+stackName=${6}
 
 sam build
-
-sam package --s3-bucket ${bucketName} --output-template-file out.yaml --profile ${awsProfile:-default}
 
 sam deploy \
   --template-file out.yaml \
