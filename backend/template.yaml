@@ -547,7 +547,7 @@ Resources:
       Description: Scan Api Endpoint
       Name: scanApiEndpointParameter
       Type: String
-      Value: !Sub "https://${scanApi}.execute-api.${AWS::Region}.amazonaws.com/dev"
+      Value: !Sub "https://${scanApi}.execute-api.${AWS::Region}.amazonaws.com/dev/path"
     DependsOn: scanApi
 
   deleteApi:
@@ -653,7 +653,7 @@ Resources:
       Description: Scan Api Endpoint
       Name: deleteApiEndpointParameter
       Type: String
-      Value: !Sub "https://${deleteApi}.execute-api.${AWS::Region}.amazonaws.com/dev"
+      Value: !Sub "https://${deleteApi}.execute-api.${AWS::Region}.amazonaws.com/dev/path"
     DependsOn: deleteApi
   
   searchApi:
@@ -759,7 +759,7 @@ Resources:
       Description: Search Api Endpoint
       Name: searchApiEndpointParameter
       Type: String
-      Value: !Sub "https://${searchApi}.execute-api.${AWS::Region}.amazonaws.com/dev"
+      Value: !Sub "https://${searchApi}.execute-api.${AWS::Region}.amazonaws.com/dev/path"
     DependsOn: searchApi
   
   userInputApi:
@@ -865,7 +865,7 @@ Resources:
       Description: User Input Api Endpoint
       Name: userInputApiEndpointParameter
       Type: String
-      Value: !Sub "https://${userInputApi}.execute-api.${AWS::Region}.amazonaws.com/dev"
+      Value: !Sub "https://${userInputApi}.execute-api.${AWS::Region}.amazonaws.com/dev/path"
     DependsOn: userInputApi
 
   compAfterEditApi:
@@ -971,7 +971,7 @@ Resources:
       Description: Comprehend After Edit Api Endpoint
       Name: compAfterEditApiEndpointParameter
       Type: String
-      Value: !Sub "https://${compAfterEditApi}.execute-api.${AWS::Region}.amazonaws.com/dev"
+      Value: !Sub "https://${compAfterEditApi}.execute-api.${AWS::Region}.amazonaws.com/dev/path"
     DependsOn: compAfterEditApi
 
   ApiGatewayIamRole:

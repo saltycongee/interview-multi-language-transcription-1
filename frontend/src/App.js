@@ -1,5 +1,6 @@
 import "./App.css";
 import Amplify, { Auth, Storage } from "aws-amplify";
+import awsconfig from './aws-exports';
 import React from "react";
 import {
   Grid,
@@ -26,14 +27,14 @@ import "react-dropdown/style.css";
 import axios from "axios";
 import { useAlert } from "react-alert";
 import Dropdown from "react-dropdown";
-//import mainTable from "./Components/mainTable"
+
 
 
 console.log(process.env.REACT_APP_REGION)
 
 function App(props) {
 
-  Amplify.configure();
+  Amplify.configure(awsconfig);
   // From AWS
   Amplify.configure({
     Storage: {
