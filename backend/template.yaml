@@ -66,6 +66,7 @@ Resources:
               - x-amz-id-2
               - ETag
             MaxAge: 3000
+  
             
   t2S3BucketNameParameter:
     Type: AWS::SSM::Parameter

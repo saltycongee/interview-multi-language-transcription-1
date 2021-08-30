@@ -36,14 +36,6 @@ function App(props) {
 
   Amplify.configure(awsconfig);
   // From AWS
-  Amplify.configure({
-    Storage: {
-      AWSS3: {
-        bucket: process.env.REACT_APP_S3_BUCKET, //REQUIRED -  Amazon S3 bucket name
-        region: process.env.REACT_APP_REGION, //OPTIONAL -  Amazon service region
-      },
-    },
-  });
 
   const api = process.env.REACT_APP_USER_INPUT_API;
   const scanApi = process.env.REACT_APP_SCAN_API;
