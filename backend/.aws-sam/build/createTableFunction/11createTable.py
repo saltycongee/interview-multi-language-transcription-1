@@ -38,13 +38,12 @@ def lambda_handler(event, context):
     print (event)
     responseBody = {
     'Status': 'SUCCESS',
-    'Reason': 'Some reason here',
-    'PhysicalResourceId': 'Custom Lambda Function',
+    'Reason': 'Table has been created',
     'StackId': event['StackId'],
     'RequestId': event['RequestId'],
     'LogicalResourceId': event['LogicalResourceId'],
     'Data': {
-        'Hello':'World'
+        'Status':'Created'
     }
     }
 

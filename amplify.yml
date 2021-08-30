@@ -15,7 +15,7 @@ applications:
             - export REACT_APP_DELETE_API=$(aws ssm get-parameter --name deleteApiEndpointParameter --query Parameter.Value --output text)
             - export REACT_APP__COMP_STATE_MACHINE=$(aws ssm get-parameter --name uploadStateMachineParameter --query Parameter.Value --output text)
             - export REACT_APP_S3_BUCKET=$(aws ssm get-parameter --name t2-s3-bucket-name --query Parameter.Value --output text)
-            - export REACT_APP_REGION=$(AWS::Region)            
+            - export REACT_APP_REGION=$(aws configure get region)            
             
     frontend:
       phases:

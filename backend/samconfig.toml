@@ -2,10 +2,10 @@ version = 0.1
 [default]
 [default.deploy]
 [default.deploy.parameters]
-stack_name = "sambk13"
-s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-19aocmplssj0w"
-s3_prefix = "sambk13"
-region = "us-east-1"
-profile = "t2-east1-dev"
+stack_name = "deploy2"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1fiyjcrcf60cy"
+s3_prefix = "deploy2"
+region = "us-west-2"
+profile = "sathcftest"
 capabilities = "CAPABILITY_IAM"
-parameter_overrides = "s3BucketName=\"bk13\" DatabaseUser=\"t2admin\""
+parameter_overrides = "s3BucketName=\"bk16\" DatabaseUser=\"t2admin\""
