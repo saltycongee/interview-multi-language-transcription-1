@@ -53,5 +53,5 @@ Some system installation requirements before starting deployment:
   The application is now being deployed using AWS SAM. This step will take arounf 15 minutes.
 
 
-2) Now follow the [frontend](docs/frontend-README.md) deployment guide and then continue with step 3 once the frontend
+2) Now follow the [frontend](frontend-README.md) deployment guide and then continue with step 3 once the frontend
    has finished deploying as we wait for a dependency in the frontend. 
