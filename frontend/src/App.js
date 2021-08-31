@@ -34,13 +34,8 @@ console.log(process.env.REACT_APP_REGION)
 
 function App(props) {
 
-  Amplify.configure(awsconfig);
   // From AWS
   Amplify.configure({
-    Auth: {
-      identityPoolId: "us-east-1:154afb63-c1a1-4b7d-b047-7273d030e4bf", //REQUIRED - Amazon Cognito Identity Pool ID
-      region: "us-east-1", // REQUIRED - Amazon Cognito Region
-    },
     Storage: {
       AWSS3: {
         bucket: process.env.REACT_APP_S3_BUCKET, //REQUIRED -  Amazon S3 bucket name
