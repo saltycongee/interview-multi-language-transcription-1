@@ -213,7 +213,7 @@ Resources:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
       DBSubnetGroupDescription: Description
-      DBSubnetGroupName: t2subnetname2
+      DBSubnetGroupName: t2subnetname-t1
       SubnetIds:
       - Ref: PublicSubnet1
       - Ref: PublicSubnet2

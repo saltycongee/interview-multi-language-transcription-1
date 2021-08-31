@@ -20,5 +20,22 @@ then select your AWS Amplify service role in the following dropdown if one exist
 6) Review the settings and click **Save and deploy**, and wait for the deployment build to complete, which will take 
    some time.
 
+7) Once the deployment is completed. Follow these steps to give your application access to S3.
+
+   a) Search for IAM in the search bar and select the IAM resourse.
+   ![alt text](iam1.PNG)
+   b) Click on Roles on the right hand side menu
+   ![alt text](iam2.PNG)
+   c) Search " -authRole " in the search bar
+   ![alt text](iam3.PNG)
+   d) Select the role auth role for your amplify deployment. It will be of the format amplify-frontend-main-{5-digit-number}-authRole
+   e) Click on attach policies
+   ![alt text](iam4.PNG)
+   f) Search for S3 and select AmazonS#FullAccess. Then click on the button on the bottom right that says Attach policy
+   ![alt text](iam5.PNG)
+
+
 Within Amplify Console, you should see an auto-generated URL under **Frontend environment** - that is the URL used 
 to access the frontend build. You can now create your user accounts and log in via the URL.
+
+NOTE: During first login, please refresh the page after creating an account.

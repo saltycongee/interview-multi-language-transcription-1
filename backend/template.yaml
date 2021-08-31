@@ -16,6 +16,8 @@ Globals:
 
 Parameters:
 
+
+
   s3BucketName: 
     AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
     ConstraintDescription: Must begin with a letter and contain only alphanumeric characters
@@ -43,6 +45,8 @@ Parameters:
     Type: String
 
 Resources:
+
+  # Main S3 Bucket
 
   DataStoreBucket:
     Type: "AWS::S3::Bucket"
@@ -77,6 +81,8 @@ Resources:
       Type: String
       Value: !Ref DataStoreBucket
     DependsOn: DataStoreBucket
+
+  #VPC and Subnets for RDS  
 
   VPC:
     Type: 'AWS::EC2::VPC'
@@ -197,10 +203,12 @@ Resources:
     Type: AWS::RDS::DBSubnetGroup
     Properties: 
       DBSubnetGroupDescription: Description
-      DBSubnetGroupName: t2subnetname2
+      DBSubnetGroupName: t2subnetname-t1
       SubnetIds: 
         - !Ref PublicSubnet1
         - !Ref PublicSubnet2
+
+  # Lambda functions
 
   asyncFunction:
     Type: 'AWS::Serverless::Function'
@@ -250,7 +258,6 @@ Resources:
       CodeUri: ./functions/7updateAfterComp
       Role: !GetAtt lambdaIamRole.Arn
       Handler: 7updateAfterComp.lambda_handler
-    
 
   scanFunction:
     Type: 'AWS::Serverless::Function'
@@ -258,7 +265,6 @@ Resources:
       CodeUri: ./functions/8scanFunction
       Role: !GetAtt lambdaIamRole.Arn
       Handler: 8scanFunction.lambda_handler
-    
 
   deleteFunction:
     Type: 'AWS::Serverless::Function'
@@ -266,8 +272,7 @@ Resources:
       CodeUri: ./functions/9deleteFunction
       Role: !GetAtt lambdaIamRole.Arn
       Handler: 9deleteFunction.lambda_handler
-    
-
+  
   searchFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
@@ -283,6 +288,8 @@ Resources:
       Role: !GetAtt lambdaIamRole.Arn
       Handler: 11createTable.lambda_handler
     DependsOn: databaseInstance
+
+  #Custom Resource to execute lambda function 
 
   createTableLambdaCallout: 
     Type: Custom::LambdaCallout
@@ -444,7 +451,8 @@ Resources:
       Value: !GetAtt translateIamRole.Arn
     DependsOn: translateIamRole
 
-  
+# APIS with CORS policies
+
   scanApi:
     Type: AWS::ApiGateway::RestApi
     Properties:

@@ -34,10 +34,53 @@ def lambda_handler(event, context):
     
 
 def deleteData( conn, tableName, username, file_name, target_language) :   
+     
     cur1 = conn.cursor() #To check if PK already exists
     cur2 = conn.cursor() #To insert delete item
+
+    
     query = '''SELECT * FROM {tableName} WHERE (username = '{username}') AND (file_name ='{file_name}') AND (target_language='{target_language}') '''.format(username=username, file_name=file_name, target_language=target_language, tableName = tableName)
     deleteQuery = ''' DELETE FROM {tableName} WHERE (username = '{username}') AND (file_name ='{file_name}') AND (target_language='{target_language}') '''.format(username=username, file_name=file_name, target_language=target_language, tableName = tableName)
+    
     cur1.execute(query)
     if(cur1.fetchall() != []):
+        print("Delete table")
+        print(cur1.fetchall())
         cur2.execute(deleteQuery)
+    results = cur1.fetchall()
+    print('results')
+    print (results)
+    if(len(results) > 0):
+        print('response')
+        for row in results:
+            
+            transcription_key = row[5]
+            print (type(row[6]))
+            bucketNameSplit = transcription_key.split('/')
+            translation_key = str(bucketNameSplit[0]) +'//'+str(bucketNameSplit[2])+'/'+ row[6]
+            file_key = str(bucketNameSplit[0]) +'//'+str(bucketNameSplit[2])+'/public/'+ row[1]
+            
+            print(transcription_key)
+            print(translation_key)
+            print(file_key)
+            
+            deleteObject(transcription_key)
+            deleteObject(translation_key)
+            deleteObject(file_key)
+
+            
+        
+    
+def deleteObject (key):
+    print ('key')
+    print (key)
+    try:
+        s3_client = boto3.client('s3')
+        response1 = s3_client.delete_object( Bucket='la-presse-main-bucket', Key=key)
+        print('done')
+        print(response1)
+        return True
+    except Exception as ex:
+        print("FAIL")
+        print(str(ex))
+        return False
