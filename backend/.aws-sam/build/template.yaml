@@ -604,7 +604,7 @@ Resources:
       Name: scanApiEndpointParameter
       Type: String
       Value:
-        Fn::Sub: https://${scanApi}.execute-api.${AWS::Region}.amazonaws.com/dev
+        Fn::Sub: https://${scanApi}.execute-api.${AWS::Region}.amazonaws.com/dev/path
     DependsOn: scanApi
   deleteApi:
     Type: AWS::ApiGateway::RestApi
@@ -730,7 +730,7 @@ Resources:
       Name: deleteApiEndpointParameter
       Type: String
       Value:
-        Fn::Sub: https://${deleteApi}.execute-api.${AWS::Region}.amazonaws.com/dev
+        Fn::Sub: https://${deleteApi}.execute-api.${AWS::Region}.amazonaws.com/dev/path
     DependsOn: deleteApi
   searchApi:
     Type: AWS::ApiGateway::RestApi
@@ -856,7 +856,7 @@ Resources:
       Name: searchApiEndpointParameter
       Type: String
       Value:
-        Fn::Sub: https://${searchApi}.execute-api.${AWS::Region}.amazonaws.com/dev
+        Fn::Sub: https://${searchApi}.execute-api.${AWS::Region}.amazonaws.com/dev/path
     DependsOn: searchApi
   userInputApi:
     Type: AWS::ApiGateway::RestApi
@@ -982,7 +982,7 @@ Resources:
       Name: userInputApiEndpointParameter
       Type: String
       Value:
-        Fn::Sub: https://${userInputApi}.execute-api.${AWS::Region}.amazonaws.com/dev
+        Fn::Sub: https://${userInputApi}.execute-api.${AWS::Region}.amazonaws.com/dev/path
     DependsOn: userInputApi
   compAfterEditApi:
     Type: AWS::ApiGateway::RestApi
@@ -1108,7 +1108,7 @@ Resources:
       Name: compAfterEditApiEndpointParameter
       Type: String
       Value:
-        Fn::Sub: https://${compAfterEditApi}.execute-api.${AWS::Region}.amazonaws.com/dev
+        Fn::Sub: https://${compAfterEditApi}.execute-api.${AWS::Region}.amazonaws.com/dev/path
     DependsOn: compAfterEditApi
   ApiGatewayIamRole:
     Type: AWS::IAM::Role
