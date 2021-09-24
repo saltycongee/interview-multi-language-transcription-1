@@ -1,6 +1,7 @@
 #To upload filename, language and keyphrases to the corresponding usernames table
 
 import psycopg2
+import boto3
 
 def lambda_handler(event, context):
     ssm = boto3.client('ssm')
