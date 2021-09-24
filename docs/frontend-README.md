@@ -31,7 +31,7 @@ then select your AWS Amplify service role in the following dropdown if one exist
    d) Select the role auth role for your amplify deployment. It will be of the format amplify-frontend-main-{5-digit-number}-authRole
    e) Click on attach policies
    ![alt text](iam4.PNG)
-   f) Search for S3 and select AmazonS#FullAccess. Then click on the button on the bottom right that says Attach policy
+   f) Search for S3 and select AmazonS3FullAccess. Then click on the button on the bottom right that says Attach policy
    ![alt text](iam5.PNG)
 
 
