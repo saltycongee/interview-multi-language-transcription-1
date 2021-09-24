@@ -11,7 +11,7 @@ applications:
             - export REACT_APP_SCAN_API=$(aws ssm get-parameter --name scanApiEndpointParameter --query Parameter.Value --output text)
             - export REACT_APP_USER_INPUT_API=$(aws ssm get-parameter --name userInputApiEndpointParameter --query Parameter.Value --output text)
             - export REACT_APP_SEARCH_API=$(aws ssm get-parameter --name searchApiEndpointParameter --query Parameter.Value --output text)
-            - export REACT_APP_UPDATE_API=$(aws ssm get-parameter --name compAfterEditApiEndpointParameter--query Parameter.Value --output text)
+            - export REACT_APP_UPDATE_API=$(aws ssm get-parameter --name compAfterEditApiEndpointParameter --query Parameter.Value --output text)
             - export REACT_APP_DELETE_API=$(aws ssm get-parameter --name deleteApiEndpointParameter --query Parameter.Value --output text)
             - export REACT_APP__COMP_STATE_MACHINE=$(aws ssm get-parameter --name uploadStateMachineParameter --query Parameter.Value --output text)
             - export REACT_APP_S3_BUCKET=$(aws ssm get-parameter --name t2-s3-bucket-name --query Parameter.Value --output text)
