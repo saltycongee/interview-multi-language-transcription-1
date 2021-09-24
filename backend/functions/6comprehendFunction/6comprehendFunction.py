@@ -17,7 +17,7 @@ def lambda_handler(event, context):
     contents = data['Body'].read()
     convertedContents = contents.decode("utf-8") 
     splitIntoSpeakers = convertedContents.split("\n")
-    payloadString = re.sub('\[\d*:\d*:\d*\]\s.*+(\.||\s)*:\s','',convertedContents)
+    payloadString = re.sub('\[\d*:\d*:\d*\]\s.*\+(\.||\s)*:\s','',convertedContents)
     keyphrase_list = []
     listOfPayloadStrings = [payloadString]
     
