@@ -46,6 +46,46 @@ def lambda_handler(event, context):
 
     keyphrase_list = eval(str(keyphrase_list).replace("'","\"").replace(r"\n",""))
     
-    return keyphrase_list
+
+    response = s3.list_objects_v2(Bucket=s3bucketName, Prefix='public/plainTextFiles/')
+    all = response['Contents']        
+    latest = max(all, key=lambda x: x['LastModified'])  
+
+    data = s3.get_object(Bucket=s3bucketName, Key=latest['Key'])
+    contents = data['Body'].read()
+    convertedContents = contents.decode("utf-8") 
+    splitIntoSpeakers = convertedContents.split("\n")
+    payloadString = re.sub('\[\d*:\d*:\d*\]\s.*\+(\.||\s)*:\s','',convertedContents)
+    keyphrase_list_transcribe = []
+    listOfPayloadStrings = [payloadString]
+    
+    while True:
+        try:
+            for j in range (len(listOfPayloadStrings)):
+                keyphrases_result = comprehend.batch_detect_key_phrases(TextList=[listOfPayloadStrings[j]], LanguageCode='en')
+                for result in keyphrases_result['ResultList'][0]['KeyPhrases']:
+                    keyphrase_list_transcribe.append(result['Text'].replace("'",''))
+            break
+        except: 
+            newListOfPayloadStrings = []
+            for string in listOfPayloadStrings:
+                split_str = string.split(" ")
+                left_str = ""
+                right_str = ""
+                leng = len(split_str)//2
+                for i in range (leng):
+                    left_str += split_str[i]
+                    right_str += split_str[i+leng]
+                    left_str += " "
+                    right_str += " "
+                newListOfPayloadStrings.append(left_str)
+                newListOfPayloadStrings.append(right_str)
+            listOfPayloadStrings = newListOfPayloadStrings
+
+    keyphrase_list_transcribe = eval(str(keyphrase_list_transcribe).replace("'","\"").replace(r"\n",""))
+    
+    keyphrase_list_combined = keyphrase_list_transcribe + keyphrase_list
+    
+    return keyphrase_list_combined
     
 
