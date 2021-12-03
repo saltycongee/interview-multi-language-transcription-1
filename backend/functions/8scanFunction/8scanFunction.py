@@ -17,7 +17,7 @@ def lambda_handler(event, context):
         'keyphrases': '',
         'description': ''
     }
-    
+    event = json.loads(event['body'])
     username = event['username']
     ssm = boto3.client('ssm')
     database = ssm.get_parameter(Name = 't2-db-dbname')
@@ -49,7 +49,32 @@ def lambda_handler(event, context):
         
         returnJson['Items'].append(itemDict)
 
-    return {
-        'statusCode' : 200,
-        'body': json.dumps(returnJson)
-    }
+    proxy_response = {}
+    proxy_response['statusCode']=200
+    proxy_response["body"] = returnJson
+
+    return setProxyResponse(proxy_response)
+    # return {
+    #     'statusCode' : 200,
+    #     'body': json.dumps(returnJson)
+    # }
+
+def setProxyResponse(data):
+        response = {}
+        response["isBase64Encoded"] = False
+        if "statusCode" in data:
+          response["statusCode"] = data["statusCode"]
+        else:
+          response["statusCode"] = 200
+        if "headers" in data:
+            response["headers"] = data["headers"]
+        else:
+            response["headers"] = {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Headers': 'Content-Type, X-Amz-Date, Authorization, X-Api-Key, X-Amz-Security-Token, X-Amz-User-Agent', 
+              'Access-Control-Allow-Origin': '*', 
+              'Access-Control-Allow-Methods': '*',
+              'Access-Control-Allow-Credentials': 'true' 
+            } 
+        response["body"] = json.dumps(data["body"])
+        return response
