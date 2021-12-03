@@ -87,5 +87,6 @@ def lambda_handler(event, context):
     keyphrase_list_combined = keyphrase_list_transcribe + keyphrase_list
     
     return keyphrase_list_combined
+ 
     
 
