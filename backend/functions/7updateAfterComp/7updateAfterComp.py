@@ -21,8 +21,8 @@ def lambda_handler(event, context):
     port=port['Parameter']['Value']
     )
     tableName = tableName['Parameter']['Value']
-    event = json.loads(event['body'])
-    event = json.loads(event['input'])
+#     event = json.loads(event['body'])
+#     event = json.loads(event['input'])
     file_name = event['file_name'] 
 
     uploadData( engine, event['username'], file_name, event['target_language'], event['keyphrases'] ,tableName )
