@@ -15,6 +15,7 @@ def lambda_handler(event, context):
     stateMachineArn = ssm.get_parameter(Name = 'uploadStateMachineParameter')
     s3bucketName = ssm.get_parameter(Name = 't2-s3-bucket-name')
     s3bucketName = s3bucketName['Parameter']['Value']
+    event = json.loads(event['body'])
     username = event['username'].split("@")
 
     #Database config
@@ -38,7 +39,12 @@ def lambda_handler(event, context):
     engine.close()
     start_state_machine(event['username'],event['file_name'],job_name, event['target_language'], event['source_language'],uploadStateMachineArn)
 
-    return job_name
+    proxy_response = {}
+    proxy_response['statusCode']=200
+    proxy_response["body"] = job_name
+
+    return setProxyResponse(proxy_response)
+    #return job_name
 
 def uploadData( conn, tableName, username, file_name, source_language, target_language,description) :   
      
@@ -87,5 +93,26 @@ def start_state_machine(username, file_name, translationJobId, target_language, 
         name = translationJobId,
         input = json.dumps(input)
         )
+    
+def setProxyResponse(data):
+        response = {}
+        response["isBase64Encoded"] = False
+        if "statusCode" in data:
+          response["statusCode"] = data["statusCode"]
+        else:
+          response["statusCode"] = 200
+        if "headers" in data:
+            response["headers"] = data["headers"]
+        else:
+            response["headers"] = {
+              'Content-Type': 'application/json', 
+              'Access-Control-Allow-Headers': 'Content-Type, X-Amz-Date, Authorization, X-Api-Key, X-Amz-Security-Token, X-Amz-User-Agent', 
+              'Access-Control-Allow-Origin': '*', 
+              'Access-Control-Allow-Methods': '*',
+              'Access-Control-Allow-Credentials': 'true'
+            } 
+        response["body"] = json.dumps(data["body"])
+        return response
+
     
 
