@@ -18,7 +18,7 @@ Some system installation requirements before starting deployment:
   Run ```pip install wheel``` in the command line if there are any issues with ```sam build``` resolving dependencies.
 
 1) Open the terminal in the `backend` folder of the repository, and then run the deployment script using the following command using 
-   your own parameter values
+   your own parameter values. Please deploy in one of the following regions: us-west-2, us-east-1, or us-east-2.
    
    For Mac, Linux and Windows Subsystem for Linux users:
 
