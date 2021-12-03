@@ -31,7 +31,7 @@ import Dropdown from "react-dropdown";
 
 
 console.log(process.env.REACT_APP_REGION)
-
+console.log(process.env.REACT_APP_S3_BUCKET)
 function App(props) {
 
   // From AWS
@@ -248,9 +248,10 @@ function App(props) {
 
   function callApi() {
     console.log("calling API");
-    //console.log(payload);
+    console.log(payload);
     Auth.currentSession().then((data) => {
       payload["username"] = data["accessToken"]["payload"]["username"];
+      console.log("done");
       axios
         .post(api, payload)
         .then((response) => {
@@ -332,14 +333,20 @@ function App(props) {
     console.log("keyphrase");
     console.log(keyphrase);
     Auth.currentSession().then((data) => {
+      console.log(data);
+      console.log(searchPayload);
       const finalSearchPayload = {
         username: data["accessToken"]["payload"]["username"],
         translateTarget: searchPayload["target_language"],
         keyphrase: keyphrase,
       };
+      console.log(finalSearchPayload)
+      console.log("test");
       axios
         .post(searchApi, finalSearchPayload)
         .then((response) => {
+          console.log(response);
+          console.log("AAAAAAAAAA");
           updateSearchedFiles(response["data"]["searchedFiles"]);
           updateShowAllStatus(false);
           updateSearchedFilesLanguage(response["data"]["language"]);
@@ -381,8 +388,11 @@ function App(props) {
       axios
         .post(scanApi, statusPayload)
         .then((response) => {
+          console.log("test")
           console.log(response);
-          let newJob = JSON.parse(response["data"]["body"]);
+//           console.log(response['body']);
+//           let newJob = JSON.parse(response["data"]["body"]);
+          let newJob = response["data"]
           console.log(newJob);
           newJob = newJob["Items"];
           //console.log(newJob);
