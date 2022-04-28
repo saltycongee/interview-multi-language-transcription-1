@@ -15,7 +15,7 @@ The T2 - Transcription and Translation tool enables users to upload audio and vi
 [Frontend Stack Deployment](/docs/frontend-README.md)
 
 ## Credits
-This prototype was coded and architected by Kishlay Chhajer and Sathvik Radhakrishnan, with guidance from the UBC CIC tech and project teams and with quoted usage and reference to some AWS sample template projects.
+This prototype was coded and architected by Kishlay Chhajer, Sathvik Radhakrishnan and Derrick Cheng, with guidance from the UBC CIC tech and project teams and with quoted usage and reference to some AWS sample template projects.
 
 ## License
 This project is distributed under the [MIT License](./LICENSE).
