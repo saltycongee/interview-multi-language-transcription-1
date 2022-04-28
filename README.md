@@ -1,4 +1,4 @@
-# T2 - Transcribe and Translate
+# T2 - Transcription and Translation Tool
 
 ## Project Summary
 
