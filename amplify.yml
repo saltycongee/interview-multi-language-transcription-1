@@ -8,15 +8,15 @@ applications:
             - amplifyPush --simple
         postBuild:
           commands:
-            - export REACT_APP_SCAN_API=$(aws ssm get-parameter --name scanApiEndpointParameter --query Parameter.Value --output text)
-            - export REACT_APP_USER_INPUT_API=$(aws ssm get-parameter --name userInputApiEndpointParameter --query Parameter.Value --output text)
-            - export REACT_APP_SEARCH_API=$(aws ssm get-parameter --name searchApiEndpointParameter --query Parameter.Value --output text)
-            - export REACT_APP_UPDATE_API=$(aws ssm get-parameter --name compAfterEditApiEndpointParameter --query Parameter.Value --output text)
-            - export REACT_APP_DELETE_API=$(aws ssm get-parameter --name deleteApiEndpointParameter --query Parameter.Value --output text)
-            - export REACT_APP_COMP_STATE_MACHINE=$(aws ssm get-parameter --name uploadStateMachineParameter --query Parameter.Value --output text)
-            - export REACT_APP_AFTER_EDIT_STATE_MACHINE=$(aws ssm get-parameter --name afterEditStateMachineParameter --query Parameter.Value --output text)
-            - export REACT_APP_S3_BUCKET=$(aws ssm get-parameter --name t2-s3-bucket-name --query Parameter.Value --output text)
-            - export REACT_APP_REGION=$(aws configure get region)            
+            - export REACT_APP_SCAN_API="https://tpt98u960a.execute-api.us-west-2.amazonaws.com/Stage/scan"
+            - export REACT_APP_USER_INPUT_API="https://tpt98u960a.execute-api.us-west-2.amazonaws.com/Stage/async"
+            - export REACT_APP_SEARCH_API="https://tpt98u960a.execute-api.us-west-2.amazonaws.com/Stage/search"
+            - export REACT_APP_UPDATE_API="https://tpt98u960a.execute-api.us-west-2.amazonaws.com/Stage/update"
+            - export REACT_APP_DELETE_API="https://tpt98u960a.execute-api.us-west-2.amazonaws.com/Stage/delete"
+            - export REACT_APP_COMP_STATE_MACHINE="arn:aws:states:us-west-2:720775636775:stateMachine:T2UploadStateMachine-EMPI39fis5Y2"
+            - export REACT_APP_AFTER_EDIT_STATE_MACHINE="arn:aws:states:us-west-2:720775636775:stateMachine:T2AfterEditStateMachine-HFdzCNcGdcF0"
+            - export REACT_APP_S3_BUCKET="t2-transcribe-and-translate-us-west-2-720775636775-a"
+            - export REACT_APP_REGION="us-west-2"            
             
     frontend:
       phases:
