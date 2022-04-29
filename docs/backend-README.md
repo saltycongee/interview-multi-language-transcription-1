@@ -28,7 +28,7 @@ Some system installation requirements before starting deployment:
 
    For Windows users:
    ```   
-   deploy.bat aws-region:<AWS_REGION> aws-profile:<AWS_PROFILE> stack-name:<STACK_NAME> 
+   ./deploy.bat aws-region:<AWS_REGION> aws-profile:<AWS_PROFILE> stack-name:<STACK_NAME> 
    ```
     
    This step will:
