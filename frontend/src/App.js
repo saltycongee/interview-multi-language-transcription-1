@@ -341,12 +341,9 @@ function App(props) {
         keyphrase: keyphrase,
       };
       console.log(finalSearchPayload)
-      console.log("test");
       axios
         .post(searchApi, finalSearchPayload)
         .then((response) => {
-          console.log(response);
-          console.log("AAAAAAAAAA");
           updateSearchedFiles(response["data"]["searchedFiles"]);
           updateShowAllStatus(false);
           updateSearchedFilesLanguage(response["data"]["language"]);
@@ -366,11 +363,9 @@ function App(props) {
       .post(scanApi, statusPayload)
       .then((response) => {
         alert.show(response["data"]["body"]);
-        //console.log(response);
-        //console.log(response);
       })
       .catch((error) => {
-        //console.log(error);
+        console.log(error);
       });
   }
 
@@ -390,12 +385,9 @@ function App(props) {
         .then((response) => {
           console.log("test")
           console.log(response);
-//           console.log(response['body']);
-//           let newJob = JSON.parse(response["data"]["body"]);
           let newJob = response["data"]
           console.log(newJob);
           newJob = newJob["Items"];
-          //console.log(newJob);
           updateJobState({
             jobs: newJob,
           });
@@ -414,7 +406,6 @@ function App(props) {
     let a = document.createElement("a");
     a.href = signedURL;
     a.download = "key";
-    //console.log(a);
     a.click();
   }
 
