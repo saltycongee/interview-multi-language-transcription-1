@@ -91,11 +91,6 @@ Resources:
       EnableDnsHostnames: true
       EnableDnsSupport: true
       InstanceTenancy: default
-      Tags:
-          Value: !Join 
-            - ''
-            - - !Ref 'AWS::StackName'
-              - '-vpc'
   InternetGateway:
     Type: 'AWS::EC2::InternetGateway'
   AttachGateway:
@@ -110,12 +105,6 @@ Resources:
       VpcId: !Ref VPC
       AvailabilityZone: !Select [0, !GetAZs '']
       MapPublicIpOnLaunch: true
-      Tags:
-        - Key: Name
-          Value: !Join 
-            - ''
-            - - !Ref 'AWS::StackName'
-              - '-Subnet1'
   PublicSubnet2:
     Type: 'AWS::EC2::Subnet'
     Properties:
@@ -123,12 +112,6 @@ Resources:
       VpcId: !Ref VPC
       AvailabilityZone: !Select [1, !GetAZs '']
       MapPublicIpOnLaunch: true
-      Tags:
-        - Key: Name
-          Value: !Join 
-            - ''
-            - - !Ref 'AWS::StackName'
-              - '-Subnet2'
 
   PublicSubnetsRouteTable:
     Type: 'AWS::EC2::RouteTable'
